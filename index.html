@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ODD SIGNAL // ERR_CARRIER_FOUND</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #39ff6e;
+  --green-dim: #1a7a38;
+  --green-faint: #0d2e18;
+  --red: #ff2244;
+  --amber: #ffaa00;
+  --bg: #030a05;
+  --scanline: rgba(0,0,0,0.35);
+  --text: #b8ffcc;
+  --text-dim: #4a8a5a;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* CRT scanlines overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline) 2px,
+    var(--scanline) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Vignette */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.75) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Background noise / error text */
+.bg-noise {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-noise span {
+  position: absolute;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--green-dim);
+  opacity: 0.18;
+  user-select: none;
+  animation: bgFlicker 4s step-end infinite;
+}
+@keyframes bgFlicker {
+  0%, 95% { opacity: 0.18; }
+  96%, 98% { opacity: 0.04; }
+  99% { opacity: 0.28; }
+  100% { opacity: 0.18; }
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
+}
+
+/* ====== HEADER ====== */
+header {
+  margin-bottom: 60px;
+  position: relative;
+}
+
+.error-prefix {
+  font-size: 11px;
+  color: var(--red);
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+  animation: redFlicker 5s step-end infinite;
+}
+@keyframes redFlicker {
+  0%, 88% { opacity: 1; }
+  89% { opacity: 0; }
+  90% { opacity: 1; }
+  93% { opacity: 0; }
+  94%, 100% { opacity: 1; }
+}
+
+.site-title {
+  font-family: 'VT323', monospace;
+  font-size: 96px;
+  line-height: 0.9;
+  letter-spacing: 4px;
+  color: var(--green);
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 0 20px rgba(57,255,110,0.4);
+}
+
+/* Chromatic aberration glitch on title */
+.site-title::before {
+  content: attr(data-text);
+  position: absolute;
+  left: -3px;
+  top: 0;
+  color: var(--red);
+  opacity: 0.6;
+  clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+  animation: glitchR 6s step-end infinite;
+}
+.site-title::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 3px;
+  top: 0;
+  color: #00aaff;
+  opacity: 0.5;
+  clip-path: polygon(0 60%, 100% 60%, 100% 78%, 0 78%);
+  animation: glitchB 6s step-end infinite;
+  animation-delay: 0.3s;
+}
+@keyframes glitchR {
+  0%, 90% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); left: -3px; }
+  91% { clip-path: polygon(0 5%, 100% 5%, 100% 15%, 0 15%); left: -5px; }
+  92% { clip-path: polygon(0 70%, 100% 70%, 100% 85%, 0 85%); left: -2px; }
+  93%, 100% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); left: -3px; }
+}
+@keyframes glitchB {
+  0%, 88% { clip-path: polygon(0 60%, 100% 60%, 100% 78%, 0 78%); left: 3px; }
+  89% { clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%); left: 5px; }
+  90%, 100% { clip-path: polygon(0 60%, 100% 60%, 100% 78%, 0 78%); left: 3px; }
+}
+
+.site-tagline {
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-top: 12px;
+  border-left: 2px solid var(--green-dim);
+  padding-left: 12px;
+}
+
+.tagline-glitch {
+  display: inline-block;
+  animation: tagFlicker 8s step-end infinite;
+}
+@keyframes tagFlicker {
+  0%, 92% { opacity: 1; }
+  93% { opacity: 0; }
+  94% { opacity: 1; }
+  95%, 97% { opacity: 0; }
+  98%, 100% { opacity: 1; }
+}
+
+/* ====== HORIZONTAL RULE ====== */
+.h-rule {
+  border: none;
+  border-top: 1px solid var(--green-dim);
+  margin: 40px 0;
+  position: relative;
+  overflow: visible;
+}
+.h-rule::after {
+  content: attr(data-label);
+  position: absolute;
+  top: -8px;
+  left: 0;
+  background: var(--bg);
+  padding-right: 12px;
+  font-size: 10px;
+  color: var(--green-dim);
+  letter-spacing: 3px;
+}
+
+/* ====== SECTION TITLES ====== */
+.section-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--green-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.section-title {
+  font-family: 'VT323', monospace;
+  font-size: 38px;
+  color: var(--green);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  position: relative;
+  display: inline-block;
+}
+.section-title .corrupt {
+  display: inline-block;
+  animation: corruptChar 7s step-end infinite;
+  color: var(--amber);
+}
+@keyframes corruptChar {
+  0%, 94% { opacity: 0; width: 0; overflow: hidden; }
+  95%, 97% { opacity: 1; width: auto; }
+  98%, 100% { opacity: 0; width: 0; }
+}
+
+/* ====== ABOUT ====== */
+.about-block {
+  max-width: 620px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.about-block p { margin-bottom: 16px; }
+.hl { color: var(--green); }
+.hl-red { color: var(--red); }
+.hl-amber { color: var(--amber); }
+
+/* ====== SERVICES ====== */
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 10px;
+}
+
+.service-card {
+  border: 1px solid var(--green-dim);
+  padding: 18px 20px;
+  position: relative;
+  transition: border-color 0.1s, background 0.1s;
+  overflow: hidden;
+  cursor: default;
+}
+.service-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--green-faint);
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.service-card:hover {
+  border-color: var(--green);
+}
+.service-card:hover::before { opacity: 1; }
+
+.service-card:hover .card-glitch { animation: cardCorrupt 0.4s step-end; }
+@keyframes cardCorrupt {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); color: var(--red); }
+  40% { transform: translateX(3px); color: var(--green); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+.card-num {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.card-title {
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  color: var(--green);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+.card-desc {
+  font-size: 12px;
+  color: #7aaa8a;
+  line-height: 1.7;
+  position: relative;
+  z-index: 1;
+}
+
+/* Occasional card flicker */
+.service-card:nth-child(3) { animation: cardFlicker 12s step-end infinite 5s; }
+@keyframes cardFlicker {
+  0%, 97% { opacity: 1; }
+  98% { opacity: 0.3; }
+  99% { opacity: 1; }
+}
+
+/* ====== CONTACT ====== */
+.contact-block {
+  max-width: 560px;
+}
+.field-group {
+  margin-bottom: 14px;
+}
+.field-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--green-dim);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+.field-input,
+.field-textarea,
+.field-select {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--green-dim);
+  color: var(--green);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  padding: 6px 2px;
+  outline: none;
+  transition: border-color 0.2s;
+  caret-color: var(--green);
+}
+.field-input:focus,
+.field-textarea:focus,
+.field-select:focus {
+  border-bottom-color: var(--green);
+}
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: var(--green-dim);
+  opacity: 0.5;
+}
+.field-textarea {
+  resize: none;
+  min-height: 80px;
+  display: block;
+}
+.field-select option {
+  background: #030a05;
+  color: var(--green);
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.send-btn {
+  background: transparent;
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 10px 28px;
+  cursor: pointer;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.1s;
+  margin-top: 8px;
+}
+.send-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--green);
+  transform: translateX(-101%);
+  transition: transform 0.15s;
+  z-index: 0;
+}
+.send-btn:hover { color: var(--bg); }
+.send-btn:hover::before { transform: translateX(0); }
+.send-btn span { position: relative; z-index: 1; }
+
+/* ====== STATUS LINE ====== */
+.status-line {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--green-faint);
+  border-top: 1px solid var(--green-dim);
+  padding: 4px 20px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+  z-index: 1000;
+}
+.status-blink {
+  animation: blink 1s step-end infinite;
+  color: var(--green);
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ====== CONFIRM ====== */
+#confirm {
+  display: none;
+  margin-top: 14px;
+  border-left: 2px solid var(--green);
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--green);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ====== NOISE HORIZONTAL GLITCH ====== */
+@keyframes hGlitch {
+  0%, 95% { clip-path: none; transform: none; }
+  96% { clip-path: polygon(0 18%, 100% 18%, 100% 24%, 0 24%); transform: translateX(-6px); }
+  97% { clip-path: polygon(0 60%, 100% 60%, 100% 64%, 0 64%); transform: translateX(4px); }
+  98% { clip-path: polygon(0 40%, 100% 40%, 100% 43%, 0 43%); transform: translateX(-3px); }
+  99%, 100% { clip-path: none; transform: none; }
+}
+.glitch-section {
+  animation: hGlitch 9s step-end infinite;
+}
+.glitch-section:nth-child(2) { animation-delay: 3s; }
+.glitch-section:nth-child(4) { animation-delay: 6s; }
+
+@media (max-width: 580px) {
+  .services-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .site-title { font-size: 64px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background error text noise -->
+<div class="bg-noise" id="bgNoise"></div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="error-prefix">// ERR_CARRIER_FOUND &nbsp;·&nbsp; SIG:ANOMALOUS &nbsp;·&nbsp; CONN:ESTABLISHED</div>
+    <div class="site-title" data-text="ODD SIGNAL">ODD SIGNAL</div>
+    <div class="site-tagline">
+      <span class="tagline-glitch">TECHNOLOGY CONSULTING FOR ARTISTS &amp; INDEPENDENTS</span>
+    </div>
+  </header>
+
+  <!-- ABOUT -->
+  <section class="glitch-section" id="about">
+    <div class="section-label">// 00 &nbsp; TRANSMISSION</div>
+    <div class="about-block">
+      <p>
+        <span class="hl">Odd Signal</span> works with artists, small studios, and independent practitioners who need technology to actually work for them — quietly, reliably, without a team of engineers to maintain it.
+      </p>
+      <p>
+        We handle the technical side so you don't have to. From hardware wired into sculpture to privately-hosted AI running your admin — the goal is always the same: <span class="hl">technology that disappears into your practice.</span>
+      </p>
+    </div>
+  </section>
+
+  <hr class="h-rule" data-label="// SERVICES_LIST">
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-label">// 01 &nbsp; AVAILABLE SERVICES</div>
+    <div class="section-title">WHAT WE DO<span class="corrupt">█</span></div>
+
+    <div class="services-grid">
+
+      <div class="service-card">
+        <div class="card-num">SVC_001</div>
+        <div class="card-title card-glitch">PRIVATE AI AGENTS</div>
+        <div class="card-desc">
+          Locally-hosted LLM agents that handle admin, correspondence drafting, scheduling, and document processing — running on your own hardware, never sending data to third-party servers.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="card-num">SVC_002</div>
+        <div class="card-title card-glitch">TECH AUDIT &amp; CLEANUP</div>
+        <div class="card-desc">
+          Computers, phones, and hard drives brought back to a clean, organised, and secure state. We audit what you have, remove what you don't need, and structure the rest so you can actually find things.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="card-num">SVC_003</div>
+        <div class="card-title card-glitch">BUDGET &amp; RESOURCES</div>
+        <div class="card-desc">
+          Private AI-assisted tools for budgeting, grant tracking, and resource allocation — built for the reality of running an art practice, not a corporation.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="card-num">SVC_004</div>
+        <div class="card-title card-glitch">ART &amp; HARDWARE</div>
+        <div class="card-desc">
+          Microprocessors, sensors, LEDs, and wireless systems integrated directly into art works and installations. Crowd-responsive lighting, interactive environments, embedded electronics — built to last.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="h-rule" data-label="// CONTACT_INIT">
+
+  <!-- CONTACT -->
+  <section class="glitch-section" id="contact">
+    <div class="section-label">// 02 &nbsp; ESTABLISH CONNECTION</div>
+    <div class="section-title">GET IN TOUCH</div>
+    <div class="contact-block">
+      <!-- FORMSPREE: replace YOUR_FORM_ID below with the ID from formspree.io/forms -->
+      <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <!-- This hidden field sets the reply-to so you can reply directly to the sender -->
+        <input type="hidden" name="_replyto" value="">
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">NAME</label>
+            <input class="field-input" type="text" name="name" placeholder="your name" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">EMAIL</label>
+            <input class="field-input" type="email" name="email" placeholder="you@example.com" required oninput="document.querySelector('[name=_replyto]').value=this.value">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">WHAT DO YOU NEED?</label>
+          <select class="field-select" name="service">
+            <option value="" disabled selected>— select service —</option>
+            <option>Private AI agent setup</option>
+            <option>Tech audit &amp; cleanup</option>
+            <option>Budget / resource tools</option>
+            <option>Art &amp; hardware integration</option>
+            <option>Not sure yet — let's talk</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">MESSAGE</label>
+          <textarea class="field-textarea" name="message" placeholder="tell us what you're working on..."></textarea>
+        </div>
+        <button type="submit" class="send-btn"><span>// TRANSMIT MESSAGE</span></button>
+      </form>
+      <div id="confirm">
+        &gt; MESSAGE RECEIVED. EXPECT RESPONSE WITHIN 2 WORKING DAYS._
+      </div>
+      <p style="margin-top:28px; font-size:11px; color:var(--text-dim); letter-spacing:1px;">
+        OR WRITE DIRECTLY &nbsp;→&nbsp; <span style="color:var(--green)">hello@oddsignal.studio</span>
+      </p>
+    </div>
+  </section>
+
+</div><!-- /wrapper -->
+
+<!-- STATUS BAR -->
+<div class="status-line">
+  <span>ODD SIGNAL &nbsp;·&nbsp; UK-BASED &nbsp;·&nbsp; WORKING WORLDWIDE</span>
+  <span id="statusRight"><span class="status-blink">▮</span> &nbsp;SIGNAL ACTIVE</span>
+</div>
+
+<script>
+// Background noise characters
+const noiseEl = document.getElementById('bgNoise');
+const chars = '01アイウエオカキクケコ░▒▓█▄▀■□▪ABCDEF0123456789ERR_SIG_OVF_NULL_REF_BAD_ADDR';
+for (let i = 0; i < 55; i++) {
+  const s = document.createElement('span');
+  s.textContent = Array.from({length: Math.floor(Math.random()*18)+4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.top = Math.random()*100 + 'vh';
+  s.style.animationDelay = (Math.random()*4) + 's';
+  s.style.transform = `rotate(${Math.random()>0.7 ? 90 : 0}deg)`;
+  noiseEl.appendChild(s);
+}
+
+// Randomly corrupt a background string occasionally
+setInterval(() => {
+  const spans = noiseEl.querySelectorAll('span');
+  const target = spans[Math.floor(Math.random()*spans.length)];
+  const orig = target.textContent;
+  target.style.color = '#ff2244';
+  target.style.opacity = '0.35';
+  setTimeout(() => {
+    target.textContent = Array.from({length: Math.floor(Math.random()*18)+4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    target.style.color = '';
+    target.style.opacity = '';
+  }, 200);
+}, 1800);
+
+// Status bar cycling messages
+const statuses = [
+  'SIGNAL ACTIVE',
+  'CARRIER DETECTED',
+  'TRANSMITTING...',
+  'SIG:ANOMALOUS — NOMINAL',
+  'UPTIME: OK',
+  'ERR_CORRECTED',
+];
+let si = 0;
+setInterval(() => {
+  si = (si + 1) % statuses.length;
+  document.getElementById('statusRight').innerHTML = '<span class="status-blink">▮</span> &nbsp;' + statuses[si];
+}, 4000);
+
+// Contact form — submits to Formspree via fetch so the page doesn't redirect
+const contactForm = document.getElementById('contact-form');
+contactForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = contactForm.querySelector('.send-btn span');
+  const confirm = document.getElementById('confirm');
+  btn.textContent = '// TRANSMITTING...';
+  contactForm.style.opacity = '0.4';
+  contactForm.style.pointerEvents = 'none';
+  try {
+    const res = await fetch(contactForm.action, {
+      method: 'POST',
+      body: new FormData(contactForm),
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      confirm.textContent = '> MESSAGE RECEIVED. EXPECT RESPONSE WITHIN 2 WORKING DAYS._';
+      confirm.style.color = 'var(--green)';
+    } else {
+      confirm.textContent = '> ERR: TRANSMISSION FAILED. PLEASE EMAIL DIRECTLY._';
+      confirm.style.color = 'var(--red)';
+    }
+  } catch {
+    confirm.textContent = '> ERR: NO CARRIER. PLEASE EMAIL DIRECTLY._';
+    confirm.style.color = 'var(--red)';
+  }
+  confirm.style.display = 'block';
+  setTimeout(() => {
+    confirm.style.display = 'none';
+    contactForm.reset();
+    contactForm.style.opacity = '1';
+    contactForm.style.pointerEvents = '';
+    btn.textContent = '// TRANSMIT MESSAGE';
+  }, 7000);
+});
+
+// Occasional full-page horizontal glitch slice
+setInterval(() => {
+  if (Math.random() > 0.6) {
+    const y1 = Math.random()*80 + 5;
+    const h = Math.random()*3 + 1;
+    const shift = (Math.random()-0.5)*18;
+    const el = document.querySelector('.wrapper');
+    el.style.clipPath = `polygon(0 ${y1}%, 100% ${y1}%, 100% ${y1+h}%, 0 ${y1+h}%)`;
+    el.style.transform = `translateX(${shift}px)`;
+    el.style.color = Math.random() > 0.5 ? '#ff2244' : '#00aaff';
+    setTimeout(() => {
+      el.style.clipPath = '';
+      el.style.transform = '';
+      el.style.color = '';
+    }, 80);
+  }
+}, 3000);
+</script>
+</body>
+</html>
