@@ -72,15 +72,26 @@ body::after {
   font-family: 'Share Tech Mono', monospace;
   font-size: 11px;
   color: var(--green-dim);
-  opacity: 0.18;
+  opacity: 0.32;
   user-select: none;
-  animation: bgFlicker 4s step-end infinite;
+  animation: bgFlicker 2s step-end infinite;
 }
 @keyframes bgFlicker {
-  0%, 95% { opacity: 0.18; }
-  96%, 98% { opacity: 0.04; }
-  99% { opacity: 0.28; }
-  100% { opacity: 0.18; }
+  0%, 80% { opacity: 0.32; }
+  81%, 83% { opacity: 0.06; }
+  84% { opacity: 0.55; color: #ff2244; }
+  85%, 91% { opacity: 0.32; color: var(--green-dim); }
+  92% { opacity: 0.6; color: #ffaa00; }
+  93%, 100% { opacity: 0.32; color: var(--green-dim); }
+}
+
+/* Canvas glitch bars layer */
+#glitch-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.85;
 }
 
 .wrapper {
@@ -95,6 +106,10 @@ body::after {
 header {
   margin-bottom: 60px;
   position: relative;
+  background: rgba(3,10,5,0.72);
+  padding: 20px 24px 24px;
+  border-left: 3px solid var(--green);
+  backdrop-filter: blur(1px);
 }
 
 .error-prefix {
@@ -114,69 +129,29 @@ header {
 
 .site-title {
   font-family: 'VT323', monospace;
-  font-size: 96px;
+  font-size: 100px;
   line-height: 0.9;
-  letter-spacing: 4px;
-  color: var(--green);
+  letter-spacing: 6px;
+  color: #ffffff;
   position: relative;
   display: inline-block;
-  text-shadow: 0 0 20px rgba(57,255,110,0.4);
-}
-
-/* Chromatic aberration glitch on title */
-.site-title::before {
-  content: attr(data-text);
-  position: absolute;
-  left: -3px;
-  top: 0;
-  color: var(--red);
-  opacity: 0.6;
-  clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
-  animation: glitchR 6s step-end infinite;
-}
-.site-title::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 3px;
-  top: 0;
-  color: #00aaff;
-  opacity: 0.5;
-  clip-path: polygon(0 60%, 100% 60%, 100% 78%, 0 78%);
-  animation: glitchB 6s step-end infinite;
-  animation-delay: 0.3s;
-}
-@keyframes glitchR {
-  0%, 90% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); left: -3px; }
-  91% { clip-path: polygon(0 5%, 100% 5%, 100% 15%, 0 15%); left: -5px; }
-  92% { clip-path: polygon(0 70%, 100% 70%, 100% 85%, 0 85%); left: -2px; }
-  93%, 100% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); left: -3px; }
-}
-@keyframes glitchB {
-  0%, 88% { clip-path: polygon(0 60%, 100% 60%, 100% 78%, 0 78%); left: 3px; }
-  89% { clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%); left: 5px; }
-  90%, 100% { clip-path: polygon(0 60%, 100% 60%, 100% 78%, 0 78%); left: 3px; }
+  text-shadow:
+    0 0 8px rgba(57,255,110,0.9),
+    0 0 30px rgba(57,255,110,0.5),
+    0 2px 0 rgba(0,0,0,0.8);
 }
 
 .site-tagline {
-  font-size: 13px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  margin-top: 12px;
-  border-left: 2px solid var(--green-dim);
-  padding-left: 12px;
+  font-size: 15px;
+  color: #e0ffe8;
+  letter-spacing: 3px;
+  margin-top: 14px;
+  border-left: 3px solid var(--green);
+  padding-left: 14px;
+  text-shadow: 0 0 12px rgba(57,255,110,0.6), 0 1px 0 rgba(0,0,0,0.9);
 }
 
-.tagline-glitch {
-  display: inline-block;
-  animation: tagFlicker 8s step-end infinite;
-}
-@keyframes tagFlicker {
-  0%, 92% { opacity: 1; }
-  93% { opacity: 0; }
-  94% { opacity: 1; }
-  95%, 97% { opacity: 0; }
-  98%, 100% { opacity: 1; }
-}
+.tagline-glitch { display: inline-block; }
 
 /* ====== HORIZONTAL RULE ====== */
 .h-rule {
@@ -451,6 +426,7 @@ header {
 
 <!-- Background error text noise -->
 <div class="bg-noise" id="bgNoise"></div>
+<canvas id="glitch-canvas"></canvas>
 
 <div class="wrapper">
 
@@ -576,32 +552,83 @@ header {
 </div>
 
 <script>
-// Background noise characters
+// Background noise characters — more of them, wider variety
 const noiseEl = document.getElementById('bgNoise');
-const chars = '01アイウエオカキクケコ░▒▓█▄▀■□▪ABCDEF0123456789ERR_SIG_OVF_NULL_REF_BAD_ADDR';
-for (let i = 0; i < 55; i++) {
+const chars = '01アイウエオカキクケコサシスセソ░▒▓█▄▀■□▪◆◇ABCDEF0123456789ERR_SIG_OVF_NULL_REF_BAD_ADDR_CORRUPT_OVERFLOW_SEGFAULT';
+for (let i = 0; i < 110; i++) {
   const s = document.createElement('span');
-  s.textContent = Array.from({length: Math.floor(Math.random()*18)+4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  const len = Math.floor(Math.random()*22)+4;
+  s.textContent = Array.from({length: len}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
   s.style.left = Math.random()*100 + 'vw';
   s.style.top = Math.random()*100 + 'vh';
-  s.style.animationDelay = (Math.random()*4) + 's';
-  s.style.transform = `rotate(${Math.random()>0.7 ? 90 : 0}deg)`;
+  s.style.animationDelay = (Math.random()*2) + 's';
+  s.style.animationDuration = (Math.random()*2 + 1.2) + 's';
+  s.style.fontSize = (Math.random() > 0.2 ? 11 : Math.floor(Math.random()*16+14)) + 'px';
+  s.style.transform = `rotate(${Math.random()>0.6 ? 90 : 0}deg)`;
   noiseEl.appendChild(s);
 }
 
-// Randomly corrupt a background string occasionally
+// Corrupt background strings more aggressively
 setInterval(() => {
   const spans = noiseEl.querySelectorAll('span');
-  const target = spans[Math.floor(Math.random()*spans.length)];
-  const orig = target.textContent;
-  target.style.color = '#ff2244';
-  target.style.opacity = '0.35';
-  setTimeout(() => {
-    target.textContent = Array.from({length: Math.floor(Math.random()*18)+4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
-    target.style.color = '';
-    target.style.opacity = '';
-  }, 200);
-}, 1800);
+  const count = Math.floor(Math.random()*5)+1;
+  for (let i = 0; i < count; i++) {
+    const target = spans[Math.floor(Math.random()*spans.length)];
+    const wasColor = target.style.color;
+    const colors = ['#ff2244','#ffaa00','#00aaff','#39ff6e'];
+    target.style.color = colors[Math.floor(Math.random()*colors.length)];
+    target.style.opacity = '0.7';
+    setTimeout(() => {
+      target.textContent = Array.from({length: Math.floor(Math.random()*22)+4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+      target.style.color = '';
+      target.style.opacity = '';
+    }, 120);
+  }
+}, 600);
+
+// Canvas glitch bars — draw random coloured horizontal slices over background
+const canvas = document.getElementById('glitch-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const glitchColors = [
+  'rgba(57,255,110,0.07)',
+  'rgba(255,34,68,0.09)',
+  'rgba(0,170,255,0.07)',
+  'rgba(255,170,0,0.06)',
+];
+
+function drawGlitch() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (Math.random() > 0.3) {
+    const bars = Math.floor(Math.random()*6)+1;
+    for (let i = 0; i < bars; i++) {
+      const y = Math.random() * canvas.height;
+      const h = Math.random() * 4 + 1;
+      const col = glitchColors[Math.floor(Math.random()*glitchColors.length)];
+      ctx.fillStyle = col;
+      ctx.fillRect(0, y, canvas.width, h);
+    }
+  }
+  // occasional full bright flash bar
+  if (Math.random() > 0.92) {
+    const y = Math.random() * canvas.height;
+    ctx.fillStyle = 'rgba(57,255,110,0.18)';
+    ctx.fillRect(0, y, canvas.width, Math.random()*2+1);
+  }
+  if (Math.random() > 0.95) {
+    const y = Math.random() * canvas.height;
+    ctx.fillStyle = 'rgba(255,34,68,0.22)';
+    ctx.fillRect(0, y, canvas.width, 1);
+  }
+  setTimeout(drawGlitch, Math.random()*120+40);
+}
+drawGlitch();
 
 // Status bar cycling messages
 const statuses = [
