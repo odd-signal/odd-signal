@@ -656,6 +656,270 @@ body::after {
 .mac-window.glitching { animation: winGlitch 0.22s step-end 1; }
 
 /* ============================================================
+   iOS MODE — iPhone OS 1–3 (auto on narrow screens)
+   ============================================================ */
+#ios-root { display: none; }
+body.mode-ios #ios-root { display: block; }
+body.mode-ios #menubar,
+body.mode-ios #desktop,
+body.mode-ios .status-line { display: none; }
+body.mode-ios { cursor: default; }
+
+/* --- status bar --- */
+#ios-statusbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 24px;
+  background: linear-gradient(180deg, #6f6f6f, #222 48%, #000 52%);
+  color: #fff; font-size: 12px; font-weight: bold;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  display: flex; align-items: center; gap: 7px; padding: 0 9px;
+  z-index: 21000; text-shadow: 0 -1px 0 #000;
+  border-bottom: 1px solid rgba(57,255,110,0.35);
+}
+#ios-bars { display: flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+#ios-bars i { width: 3px; background: #fff; border-radius: 1px 1px 0 0; display: block; }
+#ios-time { flex: 1; text-align: center; }
+#ios-batt { display: flex; align-items: center; gap: 4px; font-weight: normal; font-size: 11px; }
+.batt-shell { width: 23px; height: 11px; border: 1px solid #fff; border-radius: 2px; padding: 1.5px; position: relative; }
+.batt-shell::after { content: ''; position: absolute; right: -3.5px; top: 3px; width: 2.5px; height: 5px; background: #fff; border-radius: 0 1px 1px 0; }
+#batt-fill { height: 100%; width: 64%; background: linear-gradient(180deg, #b8ef62, #4e9613 55%, #387a08); }
+
+/* --- lock screen --- */
+#lockscreen {
+  position: fixed; inset: 0; z-index: 20500;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(3,10,5,0.55), rgba(0,0,0,0.8));
+  transition: transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.5s;
+}
+#lockscreen.unlocked { transform: translateY(-101%); opacity: 0; pointer-events: none; }
+.lock-clockbox {
+  margin-top: 56px; text-align: center; color: #fff;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.28));
+  border-top: 1px solid rgba(255,255,255,0.16);
+  border-bottom: 1px solid rgba(0,0,0,0.6);
+  padding: 16px 0 13px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+#lock-time { font-size: 62px; font-weight: 300; line-height: 1; letter-spacing: -2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+#lock-date { font-size: 15px; margin-top: 7px; opacity: 0.92; }
+.lock-flex { flex: 1; display: flex; align-items: center; justify-content: center; }
+.lock-sig {
+  font-family: 'VT323', monospace; color: var(--green);
+  font-size: 24px; letter-spacing: 5px; text-align: center; line-height: 1.7;
+  text-shadow: 0 0 16px rgba(57,255,110,0.7);
+}
+.lock-sig small { font-size: 13px; letter-spacing: 3px; color: var(--text-dim); display: block; }
+
+.unlock-tray {
+  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.8));
+  border-top: 1px solid rgba(255,255,255,0.14);
+  padding: 17px 0 max(28px, env(safe-area-inset-bottom));
+  display: flex; justify-content: center;
+}
+#slider-track {
+  position: relative; width: min(300px, 82vw); height: 52px; border-radius: 14px;
+  background: #0d0d0d;
+  box-shadow: inset 0 2px 9px #000, inset 0 -1px 0 rgba(255,255,255,0.14);
+}
+#slider-thumb {
+  position: absolute; top: 4px; left: 4px; width: 78px; height: 44px; border-radius: 10px;
+  background: linear-gradient(180deg, #fdfdfd, #c3c7cc 48%, #9aa0a8 52%, #d9dcdf);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #5a5a5a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+}
+#slider-thumb:active { cursor: grabbing; }
+#slider-label {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding-left: 52px; font-size: 19px; pointer-events: none;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: linear-gradient(90deg, rgba(255,255,255,0.4) 40%, #fff 50%, rgba(255,255,255,0.4) 60%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shimmer 2.6s linear infinite;
+}
+@keyframes shimmer { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
+
+/* --- springboard --- */
+#springboard { position: fixed; inset: 24px 0 0 0; display: flex; flex-direction: column; z-index: 5; }
+#lockscreen:not(.unlocked) ~ #springboard { visibility: hidden; }
+.sb-grid {
+  flex: 1; display: grid; grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 98px; gap: 6px 0; padding: 16px 8px 0; align-content: start;
+}
+.sb-icon {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+}
+.sb-icon .tile {
+  width: 57px; height: 57px; border-radius: 13px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; color: #fff;
+  border: 1px solid rgba(0,0,0,0.6);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.65), inset 0 1px 1px rgba(255,255,255,0.45);
+  overflow: hidden;
+}
+.sb-icon .tile::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.1));
+  border-radius: 12px 12px 45% 45% / 12px 12px 16px 16px;
+}
+.sb-icon .name { font-size: 11.5px; color: #fff; text-shadow: 0 1px 2px #000; font-weight: 500; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+.sb-icon:active .tile { filter: brightness(0.55); }
+.tile-green { background: linear-gradient(180deg, #3fcf63, #0d6e29); }
+.tile-grey  { background: linear-gradient(180deg, #8d99a6, #39434f); }
+.tile-amber { background: linear-gradient(180deg, #ffc44d, #b36a00); }
+.tile-dark  { background: linear-gradient(180deg, #3a3f44, #0b0d0f); color: var(--green); }
+.tile-blue  { background: linear-gradient(180deg, #6db3e8, #16548f); }
+
+.sb-dock {
+  margin: 0 5px max(8px, env(safe-area-inset-bottom));
+  padding: 9px 6px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.07) 40%, rgba(0,0,0,0.3));
+  border: 1px solid rgba(255,255,255,0.2);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.sb-dock .sb-icon .name { display: none; }
+
+/* --- apps --- */
+.ios-app {
+  position: fixed; inset: 24px 0 0 0; z-index: 18000;
+  background: #c5ccd3;
+  display: none; flex-direction: column;
+  transform: scale(0.15); opacity: 0;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+  transform-origin: center 65%;
+}
+.ios-app.open { display: flex; }
+.ios-app.in { transform: scale(1); opacity: 1; }
+
+.ios-navbar {
+  height: 44px; flex: 0 0 auto;
+  background: linear-gradient(180deg, #b2becf, #8b9db5 48%, #6d84a2 52%, #8195af);
+  border-bottom: 1px solid #2d3642;
+  display: flex; align-items: center; justify-content: center; position: relative;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold; font-size: 19px; color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+}
+.ios-back {
+  position: absolute; left: 7px; top: 7px; height: 30px;
+  padding: 0 11px 0 17px; display: flex; align-items: center;
+  background: linear-gradient(180deg, #8a9cb5, #5c7396 48%, #42597c 52%, #5a7194);
+  clip-path: polygon(13px 0, 100% 0, 100% 100%, 13px 100%, 0 50%);
+  border: 0; border-radius: 0 5px 5px 0;
+  font-size: 13px; font-weight: bold; color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+  cursor: pointer;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.app-body {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 16px 14px 24px;
+  color: #111; font-size: 15px; line-height: 1.65;
+  background: repeating-linear-gradient(90deg, #c5ccd3 0 6px, #cfd5db 6px 7px);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.app-body h2 { font-family: 'VT323', monospace; font-size: 32px; margin-bottom: 10px; color: #111; }
+.app-body p { margin-bottom: 12px; }
+.app-body .hl { background: var(--green); color: var(--bg); padding: 0 4px; }
+
+.home-bar {
+  flex: 0 0 auto; background: #000;
+  padding: 7px 0 max(9px, env(safe-area-inset-bottom));
+  display: flex; justify-content: center;
+}
+.home-btn {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 32%, #3d3d3d, #000 72%);
+  border: 2px solid #1f1f1f;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.16);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.home-btn::before { content: ''; width: 16px; height: 16px; border: 2px solid #6f6f6f; border-radius: 4px; }
+.home-btn:active { background: radial-gradient(circle at 50% 32%, #222, #000 72%); }
+
+/* --- iOS services table --- */
+.ios-table { background: #fff; border: 1px solid #999; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+.ios-cell {
+  padding: 13px 14px; border-bottom: 1px solid #ddd;
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  font-size: 16px; font-weight: 500;
+}
+.ios-cell:last-child { border-bottom: 0; }
+.ios-cell:active { background: linear-gradient(180deg, #4a90d9, #1a62b8); color: #fff; }
+.ios-cell .c-icon { font-size: 21px; width: 26px; text-align: center; }
+.ios-cell .chevron { margin-left: auto; color: #aaa; font-weight: bold; }
+.ios-cell-desc {
+  display: none; padding: 12px 16px; background: #f3f5f7;
+  border-bottom: 1px solid #ddd; font-size: 14px; line-height: 1.6;
+}
+.ios-cell-desc.show { display: block; animation: descIn 0.18s steps(3); }
+.ios-cell-desc .ask-btn {
+  display: inline-block; margin-top: 9px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px; font-weight: bold; color: #fff;
+  background: linear-gradient(180deg, #5dd97a, #1d7d3a);
+  border: 1px solid #145a2a; border-radius: 8px;
+  padding: 7px 14px; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
+/* --- iOS notes paper (ReadMe) --- */
+.notes-paper {
+  background: repeating-linear-gradient(180deg, #fdf6c9 0 27px, #e6d79e 27px 28px);
+  border: 1px solid #b3a26a; border-radius: 6px;
+  padding: 4px 14px 18px;
+  font-family: 'Marker Felt', 'Comic Sans MS', 'Share Tech Mono', cursive;
+  color: #3a2f1a; line-height: 28px; font-size: 15px;
+}
+.notes-paper p { margin-bottom: 0; }
+
+/* --- iOS contact form overrides --- */
+#app-contact .field-label { color: #4a5a6a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: bold; }
+#app-contact .field-input, #app-contact .field-textarea, #app-contact .field-select {
+  border-radius: 10px; border: 1px solid #a5adb5;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.18);
+  padding: 10px 11px; font-size: 16px; background: #fff;
+}
+#app-contact .send-btn {
+  width: 100%; border-radius: 10px;
+  background: linear-gradient(180deg, #5dd97a, #1d7d3a);
+  color: #fff; border: 1px solid #145a2a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  font-size: 16px; padding: 12px; letter-spacing: 1px;
+}
+#app-contact #confirm { border-radius: 8px; }
+
+/* --- iOS alert --- */
+.ios-alert {
+  position: fixed; left: 50%; top: 30%;
+  transform: translateX(-50%);
+  width: min(282px, 84vw); z-index: 30000;
+  background: linear-gradient(180deg, rgba(72,82,112,0.95), rgba(22,28,52,0.97));
+  border: 1.5px solid rgba(255,255,255,0.85); border-radius: 12px;
+  color: #fff; text-align: center;
+  padding: 15px 15px 13px;
+  display: none;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.75);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.ios-alert.open { display: block; animation: dlgIn 0.18s steps(3); }
+.ios-alert h3 { font-size: 17px; margin-bottom: 7px; }
+.ios-alert .a-msg { font-size: 13.5px; line-height: 1.55; margin-bottom: 13px; }
+.ios-alert .a-btns { display: flex; gap: 8px; }
+.ios-alert button {
+  flex: 1; height: 41px; border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.7);
+  background: linear-gradient(180deg, rgba(150,160,190,0.55), rgba(45,55,85,0.7));
+  color: #fff; font-size: 15px; font-weight: bold; cursor: pointer;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.ios-alert button.a-primary { background: linear-gradient(180deg, #5dd97a, #1d7d3a); border-color: #b9f5c8; }
+
+/* ============================================================
    MOBILE
    ============================================================ */
 @media (max-width: 640px) {
@@ -846,7 +1110,8 @@ body::after {
       <div class="title">✉ New Transmission</div>
       <div class="t-btn" data-win-shade></div>
     </div>
-    <div class="win-body">
+    <div class="win-body" id="mac-form-slot">
+      <div id="contact-form-wrap">
       <!-- FORMSPREE endpoint -->
       <form id="contact-form" action="https://formspree.io/f/mpqeylyj" method="POST">
         <input type="hidden" name="_replyto" value="">
@@ -881,6 +1146,7 @@ body::after {
       <p style="margin-top:18px; font-size:11px; color:var(--plat-darker); letter-spacing:1px;">
         OR WRITE DIRECTLY → <a href="mailto:hello@oddsignal.studio">hello@oddsignal.studio</a>
       </p>
+      </div><!-- /contact-form-wrap -->
     </div>
     <div class="win-status"><span>unsent draft</span><span id="contactStatus">carrier: OK</span></div>
   </div>
@@ -941,6 +1207,133 @@ body::after {
 
 </div><!-- /desktop -->
 
+<!-- ============ iOS MODE (iPhone OS 1–3) ============ -->
+<div id="ios-root">
+
+  <div id="ios-statusbar">
+    <span id="ios-carrier">ODD SIGNAL</span>
+    <span id="ios-bars"></span>
+    <span id="ios-time">--:--</span>
+    <span id="ios-batt"><span class="batt-shell"><span id="batt-fill"></span></span></span>
+  </div>
+
+  <!-- LOCK SCREEN -->
+  <div id="lockscreen">
+    <div class="lock-clockbox">
+      <div id="lock-time">--:--</div>
+      <div id="lock-date">&nbsp;</div>
+    </div>
+    <div class="lock-flex">
+      <div class="lock-sig">
+        ◉ ODD SIGNAL
+        <small>TECH CONSULTING FOR ARTISTS<br>// ERR_CARRIER_FOUND</small>
+      </div>
+    </div>
+    <div class="unlock-tray">
+      <div id="slider-track">
+        <span id="slider-label">slide to unlock</span>
+        <div id="slider-thumb">➜</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPRINGBOARD -->
+  <div id="springboard">
+    <div class="sb-grid">
+      <div class="sb-icon" data-app="about"><div class="tile tile-grey">⍰</div><div class="name">About</div></div>
+      <div class="sb-icon" data-app="services"><div class="tile tile-blue">⌬</div><div class="name">Services</div></div>
+      <div class="sb-icon" data-app="readme"><div class="tile tile-amber">▤</div><div class="name">ReadMe</div></div>
+      <div class="sb-icon" id="sb-signal"><div class="tile tile-dark">▮▯▮</div><div class="name">Signal</div></div>
+      <div class="sb-icon" id="sb-trash"><div class="tile tile-grey">⌫</div><div class="name">Trash</div></div>
+    </div>
+    <div class="sb-dock">
+      <div class="sb-icon" data-app="contact"><div class="tile tile-green">✉</div><div class="name">Contact</div></div>
+      <div class="sb-icon" data-app="services"><div class="tile tile-blue">⌬</div><div class="name">Services</div></div>
+      <div class="sb-icon" data-app="about"><div class="tile tile-grey">⍰</div><div class="name">About</div></div>
+      <div class="sb-icon" id="sb-mail"><div class="tile tile-dark">@</div><div class="name">Mail</div></div>
+    </div>
+  </div>
+
+  <!-- ABOUT APP -->
+  <div class="ios-app" id="app-about">
+    <div class="ios-navbar"><button class="ios-back" data-app-back>Home</button>About</div>
+    <div class="app-body">
+      <h2>ODD SIGNAL<span style="color:var(--red)">█</span></h2>
+      <p><span class="hl">Odd Signal</span> works with artists, small studios, and independent practitioners who need technology to actually work for them — quietly, reliably, without a team of engineers to maintain it.</p>
+      <p>We handle the technical side so you don't have to. From hardware wired into sculpture to privately-hosted AI running your admin — the goal is always the same: <b>technology that disappears into your practice.</b></p>
+      <p>Automating the boring parts. Bringing AI into a commission without losing the art. Rebuilding the website that embarrasses you. If it has a power button, it's in scope.</p>
+      <button class="ask-btn" data-app-open="contact" style="display:inline-block; margin-top:4px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#fff; background:linear-gradient(180deg,#5dd97a,#1d7d3a); border:1px solid #145a2a; border-radius:8px; padding:9px 16px; cursor:pointer;">✉ Start a conversation</button>
+    </div>
+    <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
+  </div>
+
+  <!-- SERVICES APP -->
+  <div class="ios-app" id="app-services">
+    <div class="ios-navbar"><button class="ios-back" data-app-back>Home</button>Services</div>
+    <div class="app-body">
+      <div class="ios-table">
+        <div class="ios-cell" data-isvc="0"><span class="c-icon">⚙</span>Private AI Agents<span class="chevron">›</span></div>
+        <div class="ios-cell-desc" data-isvc-desc="0">
+          Locally-hosted LLM agents that handle admin, correspondence drafting, scheduling, and document processing — running on your own hardware, never sending data to third-party servers.
+          <br><button class="ask-btn" data-ask-ios="Private AI agent setup">Ask about this →</button>
+        </div>
+        <div class="ios-cell" data-isvc="1"><span class="c-icon">⌦</span>Tech Audit &amp; Cleanup<span class="chevron">›</span></div>
+        <div class="ios-cell-desc" data-isvc-desc="1">
+          Computers, phones, and hard drives brought back to a clean, organised, and secure state. We audit what you have, remove what you don't need, and structure the rest so you can actually find things.
+          <br><button class="ask-btn" data-ask-ios="Tech audit &amp; cleanup">Ask about this →</button>
+        </div>
+        <div class="ios-cell" data-isvc="2"><span class="c-icon">▦</span>Budget &amp; Resources<span class="chevron">›</span></div>
+        <div class="ios-cell-desc" data-isvc-desc="2">
+          Private AI-assisted tools for budgeting, grant tracking, and resource allocation — built for the reality of running an art practice, not a corporation.
+          <br><button class="ask-btn" data-ask-ios="Budget / resource tools">Ask about this →</button>
+        </div>
+        <div class="ios-cell" data-isvc="3"><span class="c-icon">✦</span>Art &amp; Hardware<span class="chevron">›</span></div>
+        <div class="ios-cell-desc" data-isvc-desc="3">
+          Microprocessors, sensors, LEDs, and wireless systems integrated directly into art works and installations. Crowd-responsive lighting, interactive environments, embedded electronics — built to last.
+          <br><button class="ask-btn" data-ask-ios="Art &amp; hardware integration">Ask about this →</button>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#5a6671;">Tap a service to inspect. Something else? <b>Contact</b> works too — first conversation is free.</p>
+    </div>
+    <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
+  </div>
+
+  <!-- CONTACT APP -->
+  <div class="ios-app" id="app-contact">
+    <div class="ios-navbar"><button class="ios-back" data-app-back>Home</button>New Transmission</div>
+    <div class="app-body" id="ios-form-slot"></div>
+    <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
+  </div>
+
+  <!-- README APP (Notes) -->
+  <div class="ios-app" id="app-readme">
+    <div class="ios-navbar"><button class="ios-back" data-app-back>Home</button>ReadMe</div>
+    <div class="app-body">
+      <div class="notes-paper">
+        <p>== ODD SIGNAL README v9.1 ==</p>
+        <p>Q: Who is this for?<br>A: Artists, studios, independents. Anyone whose practice deserves better tech than it has.</p>
+        <p>Q: What does it cost?<br>A: First conversation is free. After that — depends on the job. No retainers unless you want one.</p>
+        <p>Q: Where?<br>A: UK-based, working worldwide. Remote or in your studio.</p>
+        <p>Q: This site looks broken.<br>A: It is supposed to. The work isn't.</p>
+        <p>— scanned this at an art meetup? say hi → Contact</p>
+      </div>
+      <button class="ask-btn" data-app-open="contact" style="display:inline-block; margin-top:12px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#fff; background:linear-gradient(180deg,#5dd97a,#1d7d3a); border:1px solid #145a2a; border-radius:8px; padding:9px 16px; cursor:pointer;">✉ Open Contact</button>
+    </div>
+    <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
+  </div>
+
+  <!-- iOS ALERT -->
+  <div class="ios-alert" id="iosAlert">
+    <h3 id="ia-title"></h3>
+    <div class="a-msg" id="ia-msg"></div>
+    <div class="a-btns">
+      <button id="ia-cancel">Cancel</button>
+      <button class="a-primary" id="ia-primary"></button>
+    </div>
+  </div>
+
+</div><!-- /ios-root -->
+
 <!-- STATUS BAR -->
 <div class="status-line">
   <span>ODD SIGNAL · UK-BASED · WORKING WORLDWIDE</span>
@@ -966,13 +1359,16 @@ const bootLines = [
   ['welcome.', 'ok'],
 ];
 let bootDone = false;
+function isIOSMode() { return document.body.classList.contains('mode-ios'); }
+// phones skip the Mac boot — the iOS lock screen is their entry
+if ((window.innerWidth || document.documentElement.clientWidth || screen.width) <= 640) { bootDone = true; boot.remove(); }
 function finishBoot() {
   if (bootDone) return;
   bootDone = true;
   boot.classList.add('done');
-  setTimeout(() => { boot.remove(); openWin('about'); }, 600);
+  setTimeout(() => { boot.remove(); if (!isIOSMode()) openWin('about'); }, 600);
   // funnel dialog appears after a beat
-  setTimeout(() => { document.getElementById('helloDialog').classList.add('open'); }, 6000);
+  setTimeout(() => { if (!isIOSMode()) document.getElementById('helloDialog').classList.add('open'); }, 6000);
 }
 boot.addEventListener('click', finishBoot);
 (function runBoot() {
@@ -1073,7 +1469,7 @@ function runTracking() {
 setInterval(() => { if (Math.random() > 0.35) runTracking(); }, 5200);
 
 function rgbHitHeadings() {
-  const heads = [...document.querySelectorAll('.mac-window.open .win-body h2')];
+  const heads = [...document.querySelectorAll('.mac-window.open .win-body h2, .ios-app.open .app-body h2')];
   if (!heads.length) return;
   const h = heads[Math.floor(Math.random() * heads.length)];
   h.classList.remove('rgb-hit');
@@ -1217,8 +1613,12 @@ document.addEventListener('keydown', e => {
 /* clock */
 function tickClock() {
   const d = new Date();
-  document.getElementById('menu-clock').textContent =
-    d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const t = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('menu-clock').textContent = t;
+  document.getElementById('ios-time').textContent = t;
+  document.getElementById('lock-time').textContent = t;
+  document.getElementById('lock-date').textContent =
+    d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
 }
 tickClock();
 setInterval(tickClock, 10000);
@@ -1270,7 +1670,7 @@ document.querySelectorAll('[data-dlg-contact]').forEach(b =>
 
 /* rare spontaneous bomb (memorable, not annoying: once per visit, late) */
 setTimeout(() => {
-  if (Math.random() > 0.5) showDialog('bombDialog');
+  if (Math.random() > 0.5) { isIOSMode() ? iosBomb() : showDialog('bombDialog'); }
 }, 90000);
 
 /* scramble desktop easter egg */
@@ -1342,6 +1742,189 @@ contactForm.addEventListener('submit', async (e) => {
     btn.textContent = '⏎ TRANSMIT';
   }, 7000);
 });
+
+/* ============================================================
+   iOS MODE — mode switch, lock screen, springboard, apps
+   ============================================================ */
+const iosFormSlot = document.getElementById('ios-form-slot');
+const macFormSlot = document.getElementById('mac-form-slot');
+const formWrap = document.getElementById('contact-form-wrap');
+
+function viewportW() {
+  // some webviews report 0 during load — fall back to stabler metrics
+  return window.innerWidth || document.documentElement.clientWidth || screen.width;
+}
+function setMode() {
+  const ios = viewportW() <= 640;
+  document.body.classList.toggle('mode-ios', ios);
+  // the one contact form lives wherever the active UI needs it
+  const slot = ios ? iosFormSlot : macFormSlot;
+  if (formWrap.parentElement !== slot) slot.appendChild(formWrap);
+}
+setMode();
+window.addEventListener('resize', setMode);
+
+/* status bar signal bars */
+const barsEl = document.getElementById('ios-bars');
+for (let i = 0; i < 5; i++) {
+  const b = document.createElement('i');
+  b.style.height = (3 + i * 2) + 'px';
+  barsEl.appendChild(b);
+}
+setInterval(() => {
+  if (!isIOSMode()) return;
+  const strength = Math.random() > 0.18 ? 5 : Math.floor(Math.random() * 4) + 1;
+  [...barsEl.children].forEach((b, i) => b.style.opacity = i < strength ? '1' : '0.25');
+}, 2200);
+
+/* carrier name corruption */
+const carrierEl = document.getElementById('ios-carrier');
+const carrierGlitches = ['0DD S1GNAL', 'ODD SIGN▓L', '◉DD_SIGNAL', 'NO SERVICE'];
+setInterval(() => {
+  if (!isIOSMode() || Math.random() < 0.45) return;
+  carrierEl.textContent = carrierGlitches[Math.floor(Math.random() * carrierGlitches.length)];
+  setTimeout(() => { carrierEl.textContent = 'ODD SIGNAL'; }, 220);
+}, 4100);
+
+/* battery jitter, brief red scare */
+const battFill = document.getElementById('batt-fill');
+setInterval(() => {
+  if (!isIOSMode() || Math.random() < 0.6) return;
+  battFill.style.width = Math.floor(Math.random() * 70 + 15) + '%';
+  if (Math.random() > 0.7) {
+    battFill.style.background = 'linear-gradient(180deg, #ff8a7a, #b00f00)';
+    setTimeout(() => { battFill.style.background = ''; }, 300);
+  }
+}, 5600);
+
+/* slide to unlock */
+const lockscreen = document.getElementById('lockscreen');
+const sliderTrack = document.getElementById('slider-track');
+const sliderThumb = document.getElementById('slider-thumb');
+const sliderLabel = document.getElementById('slider-label');
+let unlockedOnce = false;
+let sdrag = null;
+
+sliderThumb.addEventListener('pointerdown', e => {
+  sdrag = { x: e.clientX, dx: 0, max: sliderTrack.clientWidth - sliderThumb.offsetWidth - 8 };
+  sliderThumb.style.transition = 'none';
+  sliderThumb.setPointerCapture(e.pointerId);
+});
+sliderThumb.addEventListener('pointermove', e => {
+  if (!sdrag) return;
+  sdrag.dx = Math.max(0, Math.min(e.clientX - sdrag.x, sdrag.max));
+  sliderThumb.style.transform = `translateX(${sdrag.dx}px)`;
+  sliderLabel.style.opacity = String(1 - sdrag.dx / sdrag.max);
+});
+function sliderEnd() {
+  if (!sdrag) return;
+  if (sdrag.dx >= sdrag.max * 0.85) unlock();
+  else {
+    sliderThumb.style.transition = 'transform 0.25s';
+    sliderThumb.style.transform = 'translateX(0)';
+    sliderLabel.style.opacity = '';
+  }
+  sdrag = null;
+}
+sliderThumb.addEventListener('pointerup', sliderEnd);
+sliderThumb.addEventListener('pointercancel', sliderEnd);
+
+function unlock() {
+  lockscreen.classList.add('unlocked');
+  if (!unlockedOnce) {
+    unlockedOnce = true;
+    setTimeout(() => {
+      if (isIOSMode()) iosAlertShow('INCOMING TRANSMISSION',
+        'Tech problem in your practice? Website shame? AI curiosity? A sculpture that should blink? First conversation is free.',
+        'Talk to us', () => openApp('contact'));
+    }, 5000);
+  }
+}
+
+/* slider label corruption */
+setInterval(() => {
+  if (!isIOSMode() || lockscreen.classList.contains('unlocked') || Math.random() < 0.5) return;
+  const alts = ['slide to transmit', 'sl1de t0 unl0ck', 'slide to unlock'];
+  sliderLabel.textContent = alts[Math.floor(Math.random() * alts.length)];
+  setTimeout(() => { sliderLabel.textContent = 'slide to unlock'; }, 900);
+}, 6000);
+
+/* app open/close with springboard zoom */
+function openApp(name) {
+  const a = document.getElementById('app-' + name);
+  if (!a) return;
+  a.classList.add('open');
+  requestAnimationFrame(() => requestAnimationFrame(() => a.classList.add('in')));
+}
+function closeApps() {
+  document.querySelectorAll('.ios-app.open').forEach(a => {
+    a.classList.remove('in');
+    setTimeout(() => a.classList.remove('open'), 290);
+  });
+}
+document.querySelectorAll('.sb-icon[data-app]').forEach(i =>
+  i.addEventListener('click', () => openApp(i.dataset.app)));
+document.querySelectorAll('[data-app-back]').forEach(b =>
+  b.addEventListener('click', closeApps));
+document.querySelectorAll('[data-app-open]').forEach(b =>
+  b.addEventListener('click', () => openApp(b.dataset.appOpen)));
+
+/* special springboard icons */
+document.getElementById('sb-trash').addEventListener('click', iosBomb);
+document.getElementById('sb-signal').addEventListener('click', () => {
+  runTracking();
+  carrierEl.textContent = 'SIG:ANOMALOUS';
+  setTimeout(() => { carrierEl.textContent = 'ODD SIGNAL'; }, 1200);
+});
+document.getElementById('sb-mail').addEventListener('click', () => {
+  location.href = 'mailto:hello@oddsignal.studio';
+});
+
+/* iOS services table */
+document.querySelectorAll('.ios-cell[data-isvc]').forEach(c =>
+  c.addEventListener('click', () => {
+    const desc = document.querySelector(`.ios-cell-desc[data-isvc-desc="${c.dataset.isvc}"]`);
+    const was = desc.classList.contains('show');
+    document.querySelectorAll('.ios-cell-desc').forEach(d => d.classList.remove('show'));
+    if (!was) desc.classList.add('show');
+  }));
+document.querySelectorAll('[data-ask-ios]').forEach(b =>
+  b.addEventListener('click', () => {
+    openApp('contact');
+    const sel = document.getElementById('serviceSelect');
+    [...sel.options].forEach(o => { if (o.text === b.dataset.askIos) o.selected = true; });
+  }));
+
+/* iOS alert (funnel + bomb) */
+const iosAlertEl = document.getElementById('iosAlert');
+let iaAction = null;
+function iosAlertShow(title, msg, primary, onPrimary) {
+  document.getElementById('ia-title').textContent = title;
+  document.getElementById('ia-msg').textContent = msg;
+  document.getElementById('ia-primary').textContent = primary;
+  iaAction = onPrimary;
+  iosAlertEl.classList.add('open');
+}
+document.getElementById('ia-cancel').addEventListener('click', () => iosAlertEl.classList.remove('open'));
+document.getElementById('ia-primary').addEventListener('click', () => {
+  iosAlertEl.classList.remove('open');
+  if (iaAction) iaAction();
+});
+function iosBomb() {
+  iosAlertShow('System Error',
+    '"reality.cfg" — error of Type -23 (signal too odd). This is exactly the kind of thing we fix for other people.',
+    'Get Help', () => openApp('contact'));
+}
+
+/* springboard icon RGB tears */
+setInterval(() => {
+  if (!isIOSMode() || Math.random() < 0.5) return;
+  const tiles = document.querySelectorAll('#springboard .tile');
+  const t = tiles[Math.floor(Math.random() * tiles.length)];
+  t.classList.remove('rgb-hit');
+  void t.offsetWidth;
+  t.classList.add('rgb-hit');
+}, 5100);
 </script>
 </body>
 </html>

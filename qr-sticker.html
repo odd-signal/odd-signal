@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ODD SIGNAL — QR Stickers (print me)</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #39ff6e;
+  --red: #ff2244;
+  --blue: #00aaff;
+  --bg: #030a05;
+}
+body {
+  background: #1a1a1a;
+  font-family: 'Share Tech Mono', monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 30px 16px 60px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.howto {
+  color: #888;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-align: center;
+  max-width: 640px;
+  line-height: 1.8;
+}
+.howto b { color: var(--green); }
+
+.sheet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ====== THE STICKER ====== */
+.sticker {
+  width: 340px;
+  background: var(--bg);
+  border: 3px solid var(--green);
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.sticker.medium { width: 240px; padding: 13px 13px 10px; }
+.sticker.medium .brand { font-size: 30px; letter-spacing: 3px; }
+.sticker.medium .tagline { font-size: 8.5px; letter-spacing: 1.5px; }
+.sticker.medium .scanline-hint { font-size: 8px; }
+.sticker.medium .url { font-size: 11px; }
+
+/* corner glitch ticks */
+.sticker::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px dashed rgba(57,255,110,0.35);
+  border-radius: 9px;
+  pointer-events: none;
+}
+
+.err-line {
+  font-size: 8px;
+  color: var(--red);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.brand {
+  font-family: 'VT323', monospace;
+  font-size: 44px;
+  letter-spacing: 5px;
+  color: #fff;
+  line-height: 1;
+  /* RGB split — static so it prints */
+  text-shadow:
+    -2px 0 var(--red),
+    2px 0 var(--blue),
+    0 0 14px rgba(57,255,110,0.9);
+  margin-bottom: 4px;
+}
+.brand .blk { color: var(--green); }
+
+.tagline {
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+/* QR stays pure black-on-white — never glitch the modules */
+.qr-box {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  display: inline-block;
+  line-height: 0;
+}
+.qr-box img { width: 100%; max-width: 220px; height: auto; image-rendering: pixelated; }
+.sticker.medium .qr-box img { max-width: 150px; }
+
+.url {
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-top: 10px;
+  text-shadow: 0 0 8px rgba(57,255,110,0.7);
+}
+.scanline-hint {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #4a8a5a;
+  margin-top: 4px;
+}
+
+/* faux scanlines on sticker frame only (kept off the QR box) */
+.stripes {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 56px;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(57,255,110,0.07) 3px 4px);
+  pointer-events: none;
+}
+
+@media print {
+  body { background: #fff; padding: 10mm; gap: 10mm; }
+  .howto { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="howto">
+  <b>PRINT THIS PAGE</b> (Cmd+P, enable “Background graphics”) or screenshot individual stickers.<br>
+  Large = 9 cm laptop/poster sticker · Medium = 6 cm handout. QR points to <b>https://odd-signal.net</b>.<br>
+  QR kept pure black-on-white with quiet zone — glitch styling never touches the code, so scans stay reliable.
+</div>
+
+<div class="sheet">
+
+  <!-- LARGE -->
+  <div class="sticker">
+    <div class="stripes"></div>
+    <div class="err-line">// ERR_CARRIER_FOUND · SIG:ANOMALOUS</div>
+    <div class="brand">ODD SIGNAL<span class="blk">█</span></div>
+    <div class="tagline">TECH CONSULTANCY FOR ARTISTS &amp; INDEPENDENTS</div>
+    <div class="qr-box">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&qzone=1&data=https%3A%2F%2Fodd-signal.net" alt="QR code for odd-signal.net" width="220" height="220">
+    </div>
+    <div class="url">ODD-SIGNAL.NET</div>
+    <div class="scanline-hint">&gt; SCAN TO ESTABLISH CONNECTION_</div>
+  </div>
+
+  <!-- MEDIUM x2 -->
+  <div class="sticker medium">
+    <div class="stripes"></div>
+    <div class="err-line">// ERR_CARRIER_FOUND</div>
+    <div class="brand">ODD SIGNAL<span class="blk">█</span></div>
+    <div class="tagline">TECH CONSULTANCY FOR ARTISTS</div>
+    <div class="qr-box">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&qzone=1&data=https%3A%2F%2Fodd-signal.net" alt="QR code for odd-signal.net" width="150" height="150">
+    </div>
+    <div class="url">ODD-SIGNAL.NET</div>
+    <div class="scanline-hint">&gt; SCAN ME_</div>
+  </div>
+
+  <div class="sticker medium">
+    <div class="stripes"></div>
+    <div class="err-line">// SIG:ANOMALOUS</div>
+    <div class="brand">ODD SIGNAL<span class="blk">█</span></div>
+    <div class="tagline">AI · WEBSITES · HARDWARE ART</div>
+    <div class="qr-box">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&qzone=1&data=https%3A%2F%2Fodd-signal.net" alt="QR code for odd-signal.net" width="150" height="150">
+    </div>
+    <div class="url">ODD-SIGNAL.NET</div>
+    <div class="scanline-hint">&gt; FIRST CHAT FREE_</div>
+  </div>
+
+</div>
+
+</body>
+</html>
