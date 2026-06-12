@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ODD SIGNAL // ERR_CARRIER_FOUND</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+<title>ODD SIGNAL // OS 9.1 // ERR_CARRIER_FOUND</title>
+<meta name="description" content="Odd Signal — technology consulting for artists & independents. Private AI agents, tech audits, art & hardware integration.">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Pixelify+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
   --green: #39ff6e;
@@ -14,22 +15,36 @@
   --green-faint: #0d2e18;
   --red: #ff2244;
   --amber: #ffaa00;
+  --blue: #00aaff;
   --bg: #030a05;
-  --scanline: rgba(0,0,0,0.35);
+  --scanline: rgba(0,0,0,0.18);
   --text: #b8ffcc;
   --text-dim: #4a8a5a;
+
+  /* Classic Mac platinum palette */
+  --plat: #dddddd;
+  --plat-light: #f4f4f4;
+  --plat-dark: #999999;
+  --plat-darker: #555555;
+  --mac-black: #111111;
+  --titlebar-h: 24px;
+  --menubar-h: 26px;
+
+  --mac-font: 'Pixelify Sans', 'Share Tech Mono', monospace;
+  --mono: 'Share Tech Mono', monospace;
 }
 
-html { scroll-behavior: smooth; }
+html { height: 100%; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--mono);
   font-size: 14px;
   line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   cursor: crosshair;
 }
 
@@ -46,7 +61,7 @@ body::before {
     var(--scanline) 4px
   );
   pointer-events: none;
-  z-index: 9999;
+  z-index: 99999;
 }
 
 /* Vignette */
@@ -54,12 +69,115 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.75) 100%);
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%);
   pointer-events: none;
-  z-index: 9998;
+  z-index: 99998;
 }
 
-/* Background noise / error text */
+::selection { background: var(--green); color: var(--bg); }
+
+/* ============================================================
+   BOOT SCREEN
+   ============================================================ */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  z-index: 50000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  cursor: pointer;
+  transition: opacity 0.5s;
+}
+#boot.done { opacity: 0; pointer-events: none; }
+
+.boot-mac {
+  width: 120px;
+  height: 150px;
+  border: 3px solid var(--green);
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(57,255,110,0.4), inset 0 0 14px rgba(57,255,110,0.15);
+  animation: bootMacGlitch 4s step-end infinite;
+}
+.boot-mac .screen {
+  position: absolute;
+  inset: 12px 12px 40px 12px;
+  border: 2px solid var(--green);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 44px;
+  color: var(--green);
+  text-shadow: 0 0 12px rgba(57,255,110,0.8);
+  overflow: hidden;
+}
+.boot-mac .slot {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 4px;
+  background: var(--green-dim);
+}
+@keyframes bootMacGlitch {
+  0%, 90% { transform: none; filter: none; }
+  91% { transform: translateX(-4px) skewX(-3deg); filter: hue-rotate(120deg); }
+  92% { transform: translateX(3px); filter: none; }
+  93%, 100% { transform: none; }
+}
+
+.boot-title {
+  font-family: 'VT323', monospace;
+  font-size: 34px;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(57,255,110,0.8);
+}
+.boot-title .v { color: var(--green-dim); font-size: 18px; letter-spacing: 3px; }
+
+.boot-bar {
+  width: min(360px, 76vw);
+  height: 16px;
+  border: 2px solid var(--green);
+  padding: 2px;
+  box-shadow: 0 0 14px rgba(57,255,110,0.3);
+}
+.boot-bar .fill {
+  height: 100%;
+  width: 0%;
+  background: repeating-linear-gradient(90deg, var(--green) 0 8px, var(--green-dim) 8px 10px);
+  transition: width 0.18s steps(4);
+}
+
+.boot-log {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  height: 92px;
+  width: min(360px, 76vw);
+  overflow: hidden;
+  text-align: left;
+}
+.boot-log .ok { color: var(--green); }
+.boot-log .err { color: var(--red); }
+
+.boot-skip {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  animation: blink 1.2s step-end infinite;
+}
+
+/* ============================================================
+   BACKGROUND NOISE + GLITCH CANVAS
+   ============================================================ */
 .bg-noise {
   position: fixed;
   inset: 0;
@@ -69,23 +187,20 @@ body::after {
 }
 .bg-noise span {
   position: absolute;
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--mono);
   font-size: 11px;
   color: var(--green-dim);
   opacity: 0.32;
   user-select: none;
-  animation: bgFlicker 2s step-end infinite;
+  animation: bgFlicker 4.5s step-end infinite;
 }
 @keyframes bgFlicker {
-  0%, 80% { opacity: 0.32; }
-  81%, 83% { opacity: 0.06; }
-  84% { opacity: 0.55; color: #ff2244; }
-  85%, 91% { opacity: 0.32; color: var(--green-dim); }
-  92% { opacity: 0.6; color: #ffaa00; }
-  93%, 100% { opacity: 0.32; color: var(--green-dim); }
+  0%, 90% { opacity: 0.3; color: var(--green-dim); }
+  91%, 93% { opacity: 0.16; }
+  94% { opacity: 0.42; color: var(--amber); }
+  95%, 100% { opacity: 0.3; color: var(--green-dim); }
 }
 
-/* Canvas glitch bars layer */
 #glitch-canvas {
   position: fixed;
   inset: 0;
@@ -94,280 +209,420 @@ body::after {
   opacity: 0.85;
 }
 
-.wrapper {
-  position: relative;
-  z-index: 1;
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 30px 20px 60px;
+/* VHS tracking sweep — smooth band drifting down screen */
+#tracking {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  height: 72px;
+  transform: translateY(-90px);
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: linear-gradient(180deg,
+    transparent,
+    rgba(0,170,255,0.06) 44%,
+    rgba(255,255,255,0.07) 50%,
+    rgba(255,34,68,0.06) 56%,
+    transparent);
+  box-shadow: 0 0 18px rgba(57,255,110,0.05);
+}
+#tracking.run { animation: trackSweep 1.7s linear 1; }
+@keyframes trackSweep {
+  0%   { transform: translateY(-90px); opacity: 0; }
+  8%   { opacity: 0.65; }
+  50%  { opacity: 0.5; }
+  92%  { opacity: 0.65; }
+  100% { transform: translateY(100vh); opacity: 0; }
 }
 
-/* ====== HEADER ====== */
-header {
-  margin-bottom: 60px;
-  position: relative;
-  background: rgba(3,10,5,0.72);
-  padding: 20px 24px 24px;
-  border-left: 3px solid var(--green);
-  backdrop-filter: blur(1px);
+/* RGB chromatic split — brief, on headings */
+@keyframes rgbSplit {
+  0%   { text-shadow: none; transform: none; }
+  25%  { text-shadow: -2px 0 var(--red), 2px 0 var(--blue); transform: translateX(1px); }
+  50%  { text-shadow: 2px 0 var(--blue), -2px 0 var(--red); transform: translateX(-1px); }
+  75%  { text-shadow: -1px 0 var(--red), 1px 0 var(--blue); transform: translateX(1px); }
+  100% { text-shadow: none; transform: none; }
 }
+.rgb-hit { animation: rgbSplit 0.42s steps(4) 1; }
 
-.error-prefix {
-  font-size: 11px;
-  color: var(--red);
-  letter-spacing: 3px;
-  margin-bottom: 10px;
-  animation: redFlicker 5s step-end infinite;
-}
-@keyframes redFlicker {
-  0%, 88% { opacity: 1; }
-  89% { opacity: 0; }
-  90% { opacity: 1; }
-  93% { opacity: 0; }
-  94%, 100% { opacity: 1; }
-}
-
-.site-title {
-  font-family: 'VT323', monospace;
-  font-size: 100px;
-  line-height: 0.9;
-  letter-spacing: 6px;
-  color: #ffffff;
-  position: relative;
-  display: inline-block;
-  text-shadow:
-    0 0 8px rgba(57,255,110,0.9),
-    0 0 30px rgba(57,255,110,0.5),
-    0 2px 0 rgba(0,0,0,0.8);
-}
-
-.site-tagline {
-  font-size: 15px;
-  color: #e0ffe8;
-  letter-spacing: 3px;
-  margin-top: 14px;
-  border-left: 3px solid var(--green);
-  padding-left: 14px;
-  text-shadow: 0 0 12px rgba(57,255,110,0.6), 0 1px 0 rgba(0,0,0,0.9);
-}
-
-.tagline-glitch { display: inline-block; }
-
-/* ====== HORIZONTAL RULE ====== */
-.h-rule {
-  border: none;
-  border-top: 1px solid var(--green-dim);
-  margin: 40px 0;
-  position: relative;
-  overflow: visible;
-}
-.h-rule::after {
-  content: attr(data-label);
-  position: absolute;
-  top: -8px;
-  left: 0;
-  background: var(--bg);
-  padding-right: 12px;
-  font-size: 10px;
-  color: var(--green-dim);
-  letter-spacing: 3px;
-}
-
-/* ====== SECTION TITLES ====== */
-.section-label {
-  font-size: 10px;
-  letter-spacing: 4px;
-  color: var(--green-dim);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.section-title {
-  font-family: 'VT323', monospace;
-  font-size: 38px;
-  color: var(--green);
-  letter-spacing: 2px;
-  margin-bottom: 20px;
-  position: relative;
-  display: inline-block;
-}
-.section-title .corrupt {
-  display: inline-block;
-  animation: corruptChar 7s step-end infinite;
-  color: var(--amber);
-}
-@keyframes corruptChar {
-  0%, 94% { opacity: 0; width: 0; overflow: hidden; }
-  95%, 97% { opacity: 1; width: auto; }
-  98%, 100% { opacity: 0; width: 0; }
-}
-
-/* ====== ABOUT ====== */
-.about-block {
-  max-width: 620px;
-  color: var(--text);
+/* ============================================================
+   MENU BAR (classic Mac)
+   ============================================================ */
+#menubar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--menubar-h);
+  background: linear-gradient(180deg, var(--plat-light), var(--plat));
+  border-bottom: 2px solid var(--mac-black);
+  display: flex;
+  align-items: stretch;
+  z-index: 20000;
+  font-family: var(--mac-font);
   font-size: 14px;
-  line-height: 1.9;
+  color: var(--mac-black);
+  user-select: none;
+  box-shadow: 0 2px 0 rgba(57,255,110,0.25);
 }
-.about-block p { margin-bottom: 16px; }
-.hl { color: var(--green); }
-.hl-red { color: var(--red); }
-.hl-amber { color: var(--amber); }
-
-/* ====== SERVICES ====== */
-.services-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  margin-top: 10px;
-}
-
-.service-card {
-  border: 1px solid var(--green-dim);
-  padding: 18px 20px;
+.menu-item {
+  padding: 0 13px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
   position: relative;
-  transition: border-color 0.1s, background 0.1s;
-  overflow: hidden;
+  white-space: nowrap;
+}
+.menu-item:hover, .menu-item.open {
+  background: var(--mac-black);
+  color: var(--green);
+}
+.menu-logo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mac-black);
+  animation: logoGlitch 8s step-end infinite;
+}
+@keyframes logoGlitch {
+  0%, 93% { transform: none; }
+  94% { transform: translateX(-2px); color: var(--red); }
+  95% { transform: translateX(2px); color: var(--blue); }
+  96%, 100% { transform: none; }
+}
+.menu-item.open .menu-logo { color: var(--green); }
+
+.menu-spacer { flex: 1; }
+
+#menu-clock {
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 210px;
+  background: var(--plat-light);
+  border: 1px solid var(--mac-black);
+  border-top: none;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.55);
+  padding: 3px 0;
+  z-index: 20001;
+}
+.menu-item.open .dropdown { display: block; }
+.dd-item {
+  padding: 5px 18px 5px 16px;
+  color: var(--mac-black);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+.dd-item:hover { background: var(--mac-black); color: var(--green); }
+.dd-item.disabled { color: var(--plat-dark); pointer-events: none; }
+.dd-sep { border-top: 1px solid var(--plat-dark); margin: 3px 1px; }
+.dd-key { color: inherit; opacity: 0.55; font-size: 12px; }
+
+/* ============================================================
+   DESKTOP + ICONS
+   ============================================================ */
+#desktop {
+  position: fixed;
+  inset: var(--menubar-h) 0 26px 0;
+  z-index: 5;
+}
+
+.desk-icon {
+  position: absolute;
+  width: 84px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+}
+.desk-icon .glyph {
+  font-size: 34px;
+  line-height: 1.1;
+  filter: drop-shadow(0 0 6px rgba(57,255,110,0.5));
+  transition: transform 0.1s;
+}
+.desk-icon .label {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--mac-font);
+  font-size: 12px;
+  color: #fff;
+  background: rgba(3,10,5,0.85);
+  padding: 1px 6px;
+  border: 1px solid transparent;
+  text-shadow: 0 1px 0 #000;
+}
+.desk-icon:hover .glyph { transform: scale(1.12); }
+.desk-icon.selected .label {
+  background: var(--green);
+  color: var(--bg);
+}
+.desk-icon:active .glyph { animation: iconJolt 0.25s step-end; }
+@keyframes iconJolt {
+  0% { transform: translateX(-3px) scale(1.1); filter: hue-rotate(140deg); }
+  50% { transform: translateX(3px) scale(1.1); }
+  100% { transform: none; }
+}
+
+/* ============================================================
+   WINDOWS (classic Mac platinum)
+   ============================================================ */
+.mac-window {
+  position: absolute;
+  background: var(--plat);
+  border: 1px solid var(--mac-black);
+  box-shadow:
+    inset 1px 1px 0 var(--plat-light),
+    inset -1px -1px 0 var(--plat-dark),
+    4px 4px 0 rgba(0,0,0,0.55),
+    0 0 24px rgba(57,255,110,0.12);
+  min-width: 240px;
+  display: none;
+  flex-direction: column;
+  z-index: 100;
   cursor: default;
 }
-.service-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--green-faint);
-  opacity: 0;
-  transition: opacity 0.1s;
-}
-.service-card:hover {
-  border-color: var(--green);
-}
-.service-card:hover::before { opacity: 1; }
+.mac-window.open { display: flex; }
+.mac-window.shaded .win-body, .mac-window.shaded .win-status { display: none; }
 
-.service-card:hover .card-glitch { animation: cardCorrupt 0.4s step-end; }
-@keyframes cardCorrupt {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-4px); color: var(--red); }
-  40% { transform: translateX(3px); color: var(--green); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(1px); }
-  100% { transform: translateX(0); }
+.titlebar {
+  height: var(--titlebar-h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 7px;
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0 3px,
+      var(--plat-dark) 3px 4px) ,
+    linear-gradient(180deg, var(--plat-light), var(--plat));
+  background-blend-mode: normal;
+  border-bottom: 1px solid var(--mac-black);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
 }
+.titlebar:active { cursor: grabbing; }
+.mac-window.inactive .titlebar { background: var(--plat); }
+.mac-window.inactive .titlebar .stripes { visibility: hidden; }
 
-.card-num {
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
-.card-title {
-  font-family: 'VT323', monospace;
-  font-size: 24px;
-  color: var(--green);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+.titlebar .t-btn {
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--mac-black);
+  background: linear-gradient(135deg, var(--plat-light), var(--plat-dark));
+  cursor: pointer;
+  flex: 0 0 auto;
   position: relative;
-  z-index: 1;
 }
-.card-desc {
-  font-size: 12px;
-  color: #7aaa8a;
+.titlebar .t-btn:hover { background: var(--green); }
+.titlebar .t-btn:active { background: var(--mac-black); }
+
+.titlebar .title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--mac-font);
+  font-size: 14px;
+  color: var(--mac-black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: inherit;
+  padding: 0 8px;
+}
+
+.win-body {
+  padding: 16px 18px;
+  background: var(--plat-light);
+  color: var(--mac-black);
+  font-size: 13px;
   line-height: 1.7;
-  position: relative;
-  z-index: 1;
+  overflow-y: auto;
+  max-height: calc(100dvh - 160px);
+  border-top: 1px solid var(--plat-light);
+}
+.win-body::-webkit-scrollbar { width: 14px; }
+.win-body::-webkit-scrollbar-track { background: var(--plat); border-left: 1px solid var(--plat-dark); }
+.win-body::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--plat-light), var(--plat-dark)); border: 1px solid var(--mac-black); }
+
+.win-status {
+  border-top: 1px solid var(--plat-dark);
+  background: var(--plat);
+  font-family: var(--mac-font);
+  font-size: 11px;
+  color: var(--plat-darker);
+  padding: 3px 10px;
+  display: flex;
+  justify-content: space-between;
 }
 
-/* Occasional card flicker */
-.service-card:nth-child(3) { animation: cardFlicker 12s step-end infinite 5s; }
-@keyframes cardFlicker {
-  0%, 97% { opacity: 1; }
-  98% { opacity: 0.3; }
-  99% { opacity: 1; }
+/* window content typography */
+.win-body h2 {
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--mac-black);
+  margin-bottom: 10px;
 }
+.win-body p { margin-bottom: 12px; }
+.win-body .hl { background: var(--green); color: var(--bg); padding: 0 4px; }
+.win-body .hl-red { color: var(--red); font-weight: bold; }
+.win-body a { color: #0033cc; }
 
-/* ====== CONTACT ====== */
-.contact-block {
-  max-width: 560px;
+/* ====== SERVICES list (Finder-style) ====== */
+.finder-head, .finder-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 110px;
+  gap: 8px;
+  align-items: center;
 }
-.field-group {
-  margin-bottom: 14px;
+.finder-head {
+  font-family: var(--mac-font);
+  font-size: 11px;
+  color: var(--plat-darker);
+  border-bottom: 1px solid var(--plat-dark);
+  padding: 2px 6px 4px;
+  margin-bottom: 2px;
 }
+.finder-row {
+  padding: 7px 6px;
+  cursor: pointer;
+  border: 1px dotted transparent;
+}
+.finder-row:hover { background: #cfcfcf; }
+.finder-row.expanded { background: var(--mac-black); color: var(--green); }
+.finder-row .f-icon { font-size: 20px; text-align: center; }
+.finder-row .f-name { font-family: var(--mac-font); font-size: 14px; }
+.finder-row .f-kind { font-size: 11px; color: var(--plat-darker); text-align: right; }
+.finder-row.expanded .f-kind { color: var(--green-dim); }
+.finder-desc {
+  display: none;
+  padding: 10px 14px 14px 50px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  background: #efefef;
+  border-bottom: 1px solid var(--plat-dark);
+}
+.finder-desc.show { display: block; animation: descIn 0.18s steps(3); }
+@keyframes descIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+.finder-desc .ask-btn {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--mac-font);
+  font-size: 12px;
+  border: 1px solid var(--mac-black);
+  background: var(--plat);
+  padding: 3px 12px;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 var(--mac-black);
+}
+.finder-desc .ask-btn:hover { background: var(--green); }
+.finder-desc .ask-btn:active { box-shadow: none; transform: translate(1px,1px); }
+
+/* ====== CONTACT form ====== */
+.field-group { margin-bottom: 12px; }
 .field-label {
   display: block;
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--green-dim);
-  margin-bottom: 5px;
+  font-family: var(--mac-font);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--plat-darker);
+  margin-bottom: 4px;
   text-transform: uppercase;
 }
-.field-input,
-.field-textarea,
-.field-select {
+.field-input, .field-textarea, .field-select {
   width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--green-dim);
-  color: var(--green);
-  font-family: 'Share Tech Mono', monospace;
+  background: #ffffff;
+  border: 1px solid var(--mac-black);
+  box-shadow: inset 1px 1px 0 var(--plat-dark);
+  color: var(--mac-black);
+  font-family: var(--mono);
   font-size: 14px;
-  padding: 6px 2px;
+  padding: 6px 8px;
   outline: none;
-  transition: border-color 0.2s;
-  caret-color: var(--green);
+  border-radius: 0;
+  caret-color: var(--mac-black);
 }
-.field-input:focus,
-.field-textarea:focus,
-.field-select:focus {
-  border-bottom-color: var(--green);
+.field-input:focus, .field-textarea:focus, .field-select:focus {
+  box-shadow: inset 1px 1px 0 var(--plat-dark), 0 0 0 2px var(--green);
 }
-.field-input::placeholder,
-.field-textarea::placeholder {
-  color: var(--green-dim);
-  opacity: 0.5;
-}
-.field-textarea {
-  resize: none;
-  min-height: 80px;
-  display: block;
-}
-.field-select option {
-  background: #030a05;
-  color: var(--green);
-}
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+.field-textarea { resize: vertical; min-height: 80px; display: block; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
 .send-btn {
-  background: transparent;
-  border: 1px solid var(--green);
-  color: var(--green);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 3px;
-  padding: 10px 28px;
+  font-family: var(--mac-font);
+  font-size: 14px;
+  letter-spacing: 1px;
+  background: var(--plat);
+  border: 2px solid var(--mac-black);
+  border-radius: 8px;
+  color: var(--mac-black);
+  padding: 7px 26px;
   cursor: pointer;
-  text-transform: uppercase;
-  position: relative;
-  overflow: hidden;
-  transition: color 0.1s;
-  margin-top: 8px;
+  box-shadow: 2px 2px 0 var(--mac-black);
+  margin-top: 6px;
 }
-.send-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--green);
-  transform: translateX(-101%);
-  transition: transform 0.15s;
-  z-index: 0;
-}
-.send-btn:hover { color: var(--bg); }
-.send-btn:hover::before { transform: translateX(0); }
-.send-btn span { position: relative; z-index: 1; }
+.send-btn:hover { background: var(--green); }
+.send-btn:active { box-shadow: none; transform: translate(2px,2px); }
 
-/* ====== STATUS LINE ====== */
+#confirm {
+  display: none;
+  margin-top: 12px;
+  border: 1px solid var(--mac-black);
+  background: #ffffff;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--green-dim);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ====== ERROR / BOMB dialog ====== */
+.dialog {
+  position: absolute;
+  background: var(--plat-light);
+  border: 2px solid var(--mac-black);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+  padding: 18px 20px 16px;
+  min-width: 280px;
+  max-width: min(420px, 90vw);
+  z-index: 30000;
+  display: none;
+  color: var(--mac-black);
+  cursor: default;
+}
+.dialog.open { display: block; animation: dlgIn 0.15s steps(2); }
+@keyframes dlgIn { from { transform: scale(0.7); } to { transform: scale(1); } }
+.dialog .d-row { display: flex; gap: 16px; align-items: flex-start; }
+.dialog .d-icon { font-size: 34px; line-height: 1; }
+.dialog .d-text { font-size: 13px; line-height: 1.6; }
+.dialog .d-text b { font-family: var(--mac-font); }
+.dialog .d-btns { text-align: right; margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end; }
+.dialog .d-btn {
+  font-family: var(--mac-font);
+  font-size: 13px;
+  background: var(--plat);
+  border: 1px solid var(--mac-black);
+  border-radius: 6px;
+  padding: 4px 18px;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 var(--mac-black);
+}
+.dialog .d-btn.primary { border-width: 2px; box-shadow: 2px 2px 0 var(--mac-black); background: var(--green); }
+.dialog .d-btn:active { box-shadow: none; transform: translate(1px,1px); }
+
+/* ============================================================
+   STATUS LINE
+   ============================================================ */
 .status-line {
   position: fixed;
   bottom: 0;
@@ -375,151 +630,239 @@ header {
   right: 0;
   background: var(--green-faint);
   border-top: 1px solid var(--green-dim);
-  padding: 4px 20px;
+  padding: 4px 14px;
   font-size: 10px;
   letter-spacing: 2px;
   color: var(--text-dim);
   display: flex;
   justify-content: space-between;
-  z-index: 1000;
+  gap: 12px;
+  z-index: 19000;
 }
-.status-blink {
-  animation: blink 1s step-end infinite;
-  color: var(--green);
-}
+.status-line span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-blink { animation: blink 1s step-end infinite; color: var(--green); }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* ====== CONFIRM ====== */
-#confirm {
-  display: none;
-  margin-top: 14px;
-  border-left: 2px solid var(--green);
-  padding: 8px 14px;
-  font-size: 12px;
-  color: var(--green);
-  animation: fadeIn 0.3s ease;
+/* ============================================================
+   GLITCH SLICE on windows
+   ============================================================ */
+@keyframes winGlitch {
+  0% { clip-path: none; transform: var(--base-t, none); }
+  25% { clip-path: polygon(0 30%, 100% 30%, 100% 36%, 0 36%); transform: translateX(-6px); }
+  50% { clip-path: polygon(0 60%, 100% 60%, 100% 63%, 0 63%); transform: translateX(5px); }
+  75% { clip-path: polygon(0 12%, 100% 12%, 100% 15%, 0 15%); transform: translateX(-3px); }
+  100% { clip-path: none; transform: none; }
 }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.mac-window.glitching { animation: winGlitch 0.22s step-end 1; }
 
-/* ====== NOISE HORIZONTAL GLITCH ====== */
-@keyframes hGlitch {
-  0%, 95% { clip-path: none; transform: none; }
-  96% { clip-path: polygon(0 18%, 100% 18%, 100% 24%, 0 24%); transform: translateX(-6px); }
-  97% { clip-path: polygon(0 60%, 100% 60%, 100% 64%, 0 64%); transform: translateX(4px); }
-  98% { clip-path: polygon(0 40%, 100% 40%, 100% 43%, 0 43%); transform: translateX(-3px); }
-  99%, 100% { clip-path: none; transform: none; }
-}
-.glitch-section {
-  animation: hGlitch 9s step-end infinite;
-}
-.glitch-section:nth-child(2) { animation-delay: 3s; }
-.glitch-section:nth-child(4) { animation-delay: 6s; }
-
-@media (max-width: 580px) {
-  .services-grid { grid-template-columns: 1fr; }
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width: 640px) {
+  .mac-window {
+    left: 3vw !important;
+    width: 94vw !important;
+    min-width: 0;
+  }
   .form-row { grid-template-columns: 1fr; }
-  .site-title { font-size: 64px; }
+  .desk-icon { width: 72px; }
+  .desk-icon .glyph { font-size: 30px; }
+  .menu-item { padding: 0 9px; }
+  #menu-clock { font-size: 11px; padding: 0 8px; }
+  .status-line span:first-child { display: none; }
+  .win-body { max-height: calc(100dvh - 190px); }
 }
 </style>
 </head>
 <body>
 
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div class="boot-mac">
+    <div class="screen" id="bootFace">:|</div>
+    <div class="slot"></div>
+  </div>
+  <div class="boot-title">ODD SIGNAL <span class="v">OS&nbsp;9.1</span></div>
+  <div class="boot-bar"><div class="fill" id="bootFill"></div></div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-skip">CLICK ANYWHERE TO SKIP_</div>
+</div>
+
 <!-- Background error text noise -->
 <div class="bg-noise" id="bgNoise"></div>
 <canvas id="glitch-canvas"></canvas>
+<div id="tracking"></div>
 
-<div class="wrapper">
-
-  <!-- HEADER -->
-  <header>
-    <div class="error-prefix">// ERR_CARRIER_FOUND &nbsp;·&nbsp; SIG:ANOMALOUS &nbsp;·&nbsp; CONN:ESTABLISHED</div>
-    <div class="site-title" data-text="ODD SIGNAL">ODD SIGNAL</div>
-    <div class="site-tagline">
-      <span class="tagline-glitch">TECHNOLOGY CONSULTING FOR ARTISTS &amp; INDEPENDENTS</span>
+<!-- MENU BAR -->
+<div id="menubar">
+  <div class="menu-item" data-menu>
+    <span class="menu-logo">◉</span>
+    <div class="dropdown">
+      <div class="dd-item" data-action="open:about">About Odd Signal…</div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" data-action="open:readme">Read Me</div>
+      <div class="dd-item" data-action="reboot">Restart System</div>
     </div>
-  </header>
+  </div>
+  <div class="menu-item" data-menu>File
+    <div class="dropdown">
+      <div class="dd-item" data-action="open:about">Open: About <span class="dd-key">⌘1</span></div>
+      <div class="dd-item" data-action="open:services">Open: Services <span class="dd-key">⌘2</span></div>
+      <div class="dd-item" data-action="open:contact">Open: Contact <span class="dd-key">⌘3</span></div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" data-action="closeAll">Close All Windows <span class="dd-key">⌘W</span></div>
+    </div>
+  </div>
+  <div class="menu-item" data-menu>Services
+    <div class="dropdown">
+      <div class="dd-item" data-action="svc:0">Private AI Agents</div>
+      <div class="dd-item" data-action="svc:1">Tech Audit &amp; Cleanup</div>
+      <div class="dd-item" data-action="svc:2">Budget &amp; Resources</div>
+      <div class="dd-item" data-action="svc:3">Art &amp; Hardware</div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" data-action="open:contact">Request Something Else…</div>
+    </div>
+  </div>
+  <div class="menu-item" data-menu>Special
+    <div class="dropdown">
+      <div class="dd-item" data-action="bomb">Crash Gracefully</div>
+      <div class="dd-item" data-action="scramble">Scramble Desktop</div>
+      <div class="dd-item disabled">Empty Trash</div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" data-action="reboot">Restart</div>
+    </div>
+  </div>
+  <div class="menu-spacer"></div>
+  <div class="menu-item" data-action-direct="open:contact" style="color:#0a5a22; font-weight:700;">✉ GET IN TOUCH</div>
+  <div id="menu-clock">--:--</div>
+</div>
 
-  <!-- ABOUT -->
-  <section class="glitch-section" id="about">
-    <div class="section-label">// 00 &nbsp; TRANSMISSION</div>
-    <div class="about-block">
+<!-- DESKTOP -->
+<div id="desktop">
+
+  <!-- icons -->
+  <div class="desk-icon" data-open="about" style="top: 18px; right: 16px;">
+    <div class="glyph">⍰</div>
+    <div class="label">About.txt</div>
+  </div>
+  <div class="desk-icon" data-open="services" style="top: 118px; right: 16px;">
+    <div class="glyph">⌬</div>
+    <div class="label">Services</div>
+  </div>
+  <div class="desk-icon" data-open="contact" style="top: 218px; right: 16px;">
+    <div class="glyph">✉</div>
+    <div class="label">Contact</div>
+  </div>
+  <div class="desk-icon" data-open="readme" style="top: 318px; right: 16px;">
+    <div class="glyph">▤</div>
+    <div class="label">ReadMe</div>
+  </div>
+  <div class="desk-icon" data-open="trash" style="bottom: 14px; right: 16px;">
+    <div class="glyph">⌫</div>
+    <div class="label">Trash</div>
+  </div>
+
+  <!-- ABOUT WINDOW -->
+  <div class="mac-window" id="win-about" style="top: 40px; left: 4vw; width: min(560px, 92vw);">
+    <div class="titlebar">
+      <div class="t-btn" data-win-close title="Close"></div>
+      <div class="title">About.txt — ODD SIGNAL</div>
+      <div class="t-btn" data-win-shade title="Collapse"></div>
+    </div>
+    <div class="win-body">
+      <h2>ODD SIGNAL<span style="color:var(--red)">█</span></h2>
+      <p style="font-family:var(--mac-font); letter-spacing:1px; color:var(--plat-darker);">TECHNOLOGY CONSULTING FOR ARTISTS &amp; INDEPENDENTS</p>
       <p>
         <span class="hl">Odd Signal</span> works with artists, small studios, and independent practitioners who need technology to actually work for them — quietly, reliably, without a team of engineers to maintain it.
       </p>
       <p>
-        We handle the technical side so you don't have to. From hardware wired into sculpture to privately-hosted AI running your admin — the goal is always the same: <span class="hl">technology that disappears into your practice.</span>
+        We handle the technical side so you don't have to. From hardware wired into sculpture to privately-hosted AI running your admin — the goal is always the same: <b>technology that disappears into your practice.</b>
       </p>
+      <p>
+        Automating the boring parts. Bringing AI into a commission without losing the art. Rebuilding the website that embarrasses you. Or anything else — if it has a power button, it's in scope.
+      </p>
+      <button class="send-btn" data-open-win="contact">✉ Start a conversation</button>
     </div>
-  </section>
+    <div class="win-status"><span>1 item</span><span>4.2 MB in disk</span></div>
+  </div>
 
-  <hr class="h-rule" data-label="// SERVICES_LIST">
-
-  <!-- SERVICES -->
-  <section id="services">
-    <div class="section-label">// 01 &nbsp; AVAILABLE SERVICES</div>
-    <div class="section-title">WHAT WE DO<span class="corrupt">█</span></div>
-
-    <div class="services-grid">
-
-      <div class="service-card">
-        <div class="card-num">SVC_001</div>
-        <div class="card-title card-glitch">PRIVATE AI AGENTS</div>
-        <div class="card-desc">
-          Locally-hosted LLM agents that handle admin, correspondence drafting, scheduling, and document processing — running on your own hardware, never sending data to third-party servers.
-        </div>
-      </div>
-
-      <div class="service-card">
-        <div class="card-num">SVC_002</div>
-        <div class="card-title card-glitch">TECH AUDIT &amp; CLEANUP</div>
-        <div class="card-desc">
-          Computers, phones, and hard drives brought back to a clean, organised, and secure state. We audit what you have, remove what you don't need, and structure the rest so you can actually find things.
-        </div>
-      </div>
-
-      <div class="service-card">
-        <div class="card-num">SVC_003</div>
-        <div class="card-title card-glitch">BUDGET &amp; RESOURCES</div>
-        <div class="card-desc">
-          Private AI-assisted tools for budgeting, grant tracking, and resource allocation — built for the reality of running an art practice, not a corporation.
-        </div>
-      </div>
-
-      <div class="service-card">
-        <div class="card-num">SVC_004</div>
-        <div class="card-title card-glitch">ART &amp; HARDWARE</div>
-        <div class="card-desc">
-          Microprocessors, sensors, LEDs, and wireless systems integrated directly into art works and installations. Crowd-responsive lighting, interactive environments, embedded electronics — built to last.
-        </div>
-      </div>
-
+  <!-- SERVICES WINDOW -->
+  <div class="mac-window" id="win-services" style="top: 80px; left: 8vw; width: min(540px, 92vw);">
+    <div class="titlebar">
+      <div class="t-btn" data-win-close></div>
+      <div class="title">Services — 4 items</div>
+      <div class="t-btn" data-win-shade></div>
     </div>
-  </section>
+    <div class="win-body" style="padding: 8px 10px;">
+      <div class="finder-head"><span></span><span>Name</span><span style="text-align:right">Kind</span></div>
 
-  <hr class="h-rule" data-label="// CONTACT_INIT">
+      <div class="finder-row" data-svc="0">
+        <div class="f-icon">⚙</div>
+        <div class="f-name">Private AI Agents</div>
+        <div class="f-kind">application</div>
+      </div>
+      <div class="finder-desc" data-svc-desc="0">
+        Locally-hosted LLM agents that handle admin, correspondence drafting, scheduling, and document processing — running on your own hardware, never sending data to third-party servers.
+        <br><button class="ask-btn" data-ask="Private AI agent setup">Ask about this →</button>
+      </div>
 
-  <!-- CONTACT -->
-  <section class="glitch-section" id="contact">
-    <div class="section-label">// 02 &nbsp; ESTABLISH CONNECTION</div>
-    <div class="section-title">GET IN TOUCH</div>
-    <div class="contact-block">
-      <!-- FORMSPREE: replace YOUR_FORM_ID below with the ID from formspree.io/forms -->
-      <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-        <!-- This hidden field sets the reply-to so you can reply directly to the sender -->
+      <div class="finder-row" data-svc="1">
+        <div class="f-icon">⌦</div>
+        <div class="f-name">Tech Audit &amp; Cleanup</div>
+        <div class="f-kind">utility</div>
+      </div>
+      <div class="finder-desc" data-svc-desc="1">
+        Computers, phones, and hard drives brought back to a clean, organised, and secure state. We audit what you have, remove what you don't need, and structure the rest so you can actually find things.
+        <br><button class="ask-btn" data-ask="Tech audit &amp; cleanup">Ask about this →</button>
+      </div>
+
+      <div class="finder-row" data-svc="2">
+        <div class="f-icon">▦</div>
+        <div class="f-name">Budget &amp; Resources</div>
+        <div class="f-kind">spreadsheet</div>
+      </div>
+      <div class="finder-desc" data-svc-desc="2">
+        Private AI-assisted tools for budgeting, grant tracking, and resource allocation — built for the reality of running an art practice, not a corporation.
+        <br><button class="ask-btn" data-ask="Budget / resource tools">Ask about this →</button>
+      </div>
+
+      <div class="finder-row" data-svc="3">
+        <div class="f-icon">✦</div>
+        <div class="f-name">Art &amp; Hardware</div>
+        <div class="f-kind">installation</div>
+      </div>
+      <div class="finder-desc" data-svc-desc="3">
+        Microprocessors, sensors, LEDs, and wireless systems integrated directly into art works and installations. Crowd-responsive lighting, interactive environments, embedded electronics — built to last.
+        <br><button class="ask-btn" data-ask="Art &amp; hardware integration">Ask about this →</button>
+      </div>
+    </div>
+    <div class="win-status"><span>4 items</span><span>click a row to inspect</span></div>
+  </div>
+
+  <!-- CONTACT WINDOW -->
+  <div class="mac-window" id="win-contact" style="top: 60px; left: 12vw; width: min(520px, 92vw);">
+    <div class="titlebar">
+      <div class="t-btn" data-win-close></div>
+      <div class="title">✉ New Transmission</div>
+      <div class="t-btn" data-win-shade></div>
+    </div>
+    <div class="win-body">
+      <!-- FORMSPREE endpoint -->
+      <form id="contact-form" action="https://formspree.io/f/mpqeylyj" method="POST">
         <input type="hidden" name="_replyto" value="">
         <div class="form-row">
           <div class="field-group">
-            <label class="field-label">NAME</label>
+            <label class="field-label">Name</label>
             <input class="field-input" type="text" name="name" placeholder="your name" required>
           </div>
           <div class="field-group">
-            <label class="field-label">EMAIL</label>
+            <label class="field-label">Email</label>
             <input class="field-input" type="email" name="email" placeholder="you@example.com" required oninput="document.querySelector('[name=_replyto]').value=this.value">
           </div>
         </div>
         <div class="field-group">
-          <label class="field-label">WHAT DO YOU NEED?</label>
-          <select class="field-select" name="service">
+          <label class="field-label">What do you need?</label>
+          <select class="field-select" name="service" id="serviceSelect">
             <option value="" disabled selected>— select service —</option>
             <option>Private AI agent setup</option>
             <option>Tech audit &amp; cleanup</option>
@@ -529,108 +872,421 @@ header {
           </select>
         </div>
         <div class="field-group">
-          <label class="field-label">MESSAGE</label>
+          <label class="field-label">Message</label>
           <textarea class="field-textarea" name="message" placeholder="tell us what you're working on..."></textarea>
         </div>
-        <button type="submit" class="send-btn"><span>// TRANSMIT MESSAGE</span></button>
+        <button type="submit" class="send-btn">⏎ TRANSMIT</button>
       </form>
-      <div id="confirm">
-        &gt; MESSAGE RECEIVED. EXPECT RESPONSE WITHIN 2 WORKING DAYS._
-      </div>
-      <p style="margin-top:28px; font-size:11px; color:var(--text-dim); letter-spacing:1px;">
-        OR WRITE DIRECTLY &nbsp;→&nbsp; <span style="color:var(--green)">hello@oddsignal.studio</span>
+      <div id="confirm">&gt; MESSAGE RECEIVED. EXPECT RESPONSE WITHIN 2 WORKING DAYS._</div>
+      <p style="margin-top:18px; font-size:11px; color:var(--plat-darker); letter-spacing:1px;">
+        OR WRITE DIRECTLY → <a href="mailto:hello@oddsignal.studio">hello@oddsignal.studio</a>
       </p>
     </div>
-  </section>
+    <div class="win-status"><span>unsent draft</span><span id="contactStatus">carrier: OK</span></div>
+  </div>
 
-</div><!-- /wrapper -->
+  <!-- README WINDOW -->
+  <div class="mac-window" id="win-readme" style="top: 110px; left: 16vw; width: min(440px, 92vw);">
+    <div class="titlebar">
+      <div class="t-btn" data-win-close></div>
+      <div class="title">ReadMe — SimpleText</div>
+      <div class="t-btn" data-win-shade></div>
+    </div>
+    <div class="win-body" style="font-family: var(--mono); font-size: 12.5px;">
+      <p>== ODD SIGNAL README v9.1 ==</p>
+      <p>Q: Who is this for?<br>
+      A: Artists, studios, independents. Anyone whose practice deserves better tech than it has.</p>
+      <p>Q: What does it cost?<br>
+      A: First conversation is free. After that — depends on the job. No retainers unless you want one.</p>
+      <p>Q: Where?<br>
+      A: UK-based, working worldwide. Remote or in your studio.</p>
+      <p>Q: This site looks broken.<br>
+      A: It is supposed to. The work isn't.</p>
+      <p style="color:var(--plat-darker)">— scanned this at an art meetup? say hi: <button class="ask-btn" data-open-win="contact" style="margin-top:0">open contact ✉</button></p>
+    </div>
+    <div class="win-status"><span>plain text</span><span>last modified: 1999</span></div>
+  </div>
+
+  <!-- BOMB DIALOG -->
+  <div class="dialog" id="bombDialog" style="top: 25%; left: 50%; transform: translateX(-50%);">
+    <div class="d-row">
+      <div class="d-icon">💣</div>
+      <div class="d-text">
+        <b>Sorry, a system error occurred.</b><br>
+        "reality.cfg" — error of Type -23 (signal too odd).<br>
+        <span style="color:var(--plat-darker); font-size:11.5px;">This is exactly the kind of thing we fix for other people.</span>
+      </div>
+    </div>
+    <div class="d-btns">
+      <button class="d-btn" data-dlg-close>Ignore</button>
+      <button class="d-btn primary" data-dlg-contact>Get Help ✉</button>
+    </div>
+  </div>
+
+  <!-- WELCOME / FUNNEL DIALOG -->
+  <div class="dialog" id="helloDialog" style="top: 20%; left: 50%; transform: translateX(-50%);">
+    <div class="d-row">
+      <div class="d-icon">⚠</div>
+      <div class="d-text">
+        <b>INCOMING TRANSMISSION</b><br>
+        Tech problem in your practice? Website shame? AI curiosity? A sculpture that should blink?<br>
+        <span style="color:var(--plat-darker); font-size:11.5px;">First conversation is free.</span>
+      </div>
+    </div>
+    <div class="d-btns">
+      <button class="d-btn" data-dlg-close>Just browsing</button>
+      <button class="d-btn primary" data-dlg-contact>Talk to us ✉</button>
+    </div>
+  </div>
+
+</div><!-- /desktop -->
 
 <!-- STATUS BAR -->
 <div class="status-line">
-  <span>ODD SIGNAL &nbsp;·&nbsp; UK-BASED &nbsp;·&nbsp; WORKING WORLDWIDE</span>
-  <span id="statusRight"><span class="status-blink">▮</span> &nbsp;SIGNAL ACTIVE</span>
+  <span>ODD SIGNAL · UK-BASED · WORKING WORLDWIDE</span>
+  <span id="statusRight"><span class="status-blink">▮</span> SIGNAL ACTIVE</span>
 </div>
 
 <script>
-// Background noise characters — more of them, wider variety
+/* ============================================================
+   BOOT SEQUENCE
+   ============================================================ */
+const boot = document.getElementById('boot');
+const bootFill = document.getElementById('bootFill');
+const bootLog = document.getElementById('bootLog');
+const bootFace = document.getElementById('bootFace');
+const bootLines = [
+  ['init oddsignal.kernel', 'ok'],
+  ['mount /dev/practice', 'ok'],
+  ['load extension: PRIVATE_AI', 'ok'],
+  ['load extension: HARDWARE_ART', 'ok'],
+  ['load extension: CORPORATE_JARGON', 'err'],
+  ['  └ skipped. not needed.', ''],
+  ['detect carrier… FOUND (anomalous)', 'ok'],
+  ['welcome.', 'ok'],
+];
+let bootDone = false;
+function finishBoot() {
+  if (bootDone) return;
+  bootDone = true;
+  boot.classList.add('done');
+  setTimeout(() => { boot.remove(); openWin('about'); }, 600);
+  // funnel dialog appears after a beat
+  setTimeout(() => { document.getElementById('helloDialog').classList.add('open'); }, 6000);
+}
+boot.addEventListener('click', finishBoot);
+(function runBoot() {
+  let i = 0, pct = 0;
+  const faces = [':|', ':)', ':D', ';)'];
+  const step = () => {
+    if (bootDone) return;
+    if (i < bootLines.length) {
+      const [txt, cls] = bootLines[i];
+      const div = document.createElement('div');
+      div.innerHTML = (cls === 'err' ? '<span class="err">✕</span> ' : cls === 'ok' ? '<span class="ok">✓</span> ' : '&nbsp;&nbsp;') + txt;
+      bootLog.appendChild(div);
+      while (bootLog.children.length > 6) bootLog.removeChild(bootLog.firstChild);
+      i++;
+    }
+    pct = Math.min(100, pct + Math.random() * 18 + 6);
+    bootFill.style.width = pct + '%';
+    bootFace.textContent = faces[Math.min(faces.length - 1, Math.floor(pct / 30))];
+    if (pct >= 100 && i >= bootLines.length) { setTimeout(finishBoot, 700); }
+    else setTimeout(step, Math.random() * 300 + 180);
+  };
+  setTimeout(step, 400);
+})();
+
+/* ============================================================
+   BACKGROUND NOISE
+   ============================================================ */
 const noiseEl = document.getElementById('bgNoise');
 const chars = '01アイウエオカキクケコサシスセソ░▒▓█▄▀■□▪◆◇ABCDEF0123456789ERR_SIG_OVF_NULL_REF_BAD_ADDR_CORRUPT_OVERFLOW_SEGFAULT';
 for (let i = 0; i < 110; i++) {
   const s = document.createElement('span');
-  const len = Math.floor(Math.random()*22)+4;
-  s.textContent = Array.from({length: len}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
-  s.style.left = Math.random()*100 + 'vw';
-  s.style.top = Math.random()*100 + 'vh';
-  s.style.animationDelay = (Math.random()*2) + 's';
-  s.style.animationDuration = (Math.random()*2 + 1.2) + 's';
-  s.style.fontSize = (Math.random() > 0.2 ? 11 : Math.floor(Math.random()*16+14)) + 'px';
-  s.style.transform = `rotate(${Math.random()>0.6 ? 90 : 0}deg)`;
+  const len = Math.floor(Math.random() * 22) + 4;
+  s.textContent = Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  s.style.left = Math.random() * 100 + 'vw';
+  s.style.top = Math.random() * 100 + 'vh';
+  s.style.animationDelay = (Math.random() * 2) + 's';
+  s.style.animationDuration = (Math.random() * 3 + 3) + 's';
+  s.style.fontSize = (Math.random() > 0.2 ? 11 : Math.floor(Math.random() * 16 + 14)) + 'px';
+  s.style.transform = `rotate(${Math.random() > 0.6 ? 90 : 0}deg)`;
   noiseEl.appendChild(s);
 }
-
-// Corrupt background strings more aggressively
 setInterval(() => {
   const spans = noiseEl.querySelectorAll('span');
-  const count = Math.floor(Math.random()*5)+1;
+  const count = Math.floor(Math.random() * 5) + 1;
   for (let i = 0; i < count; i++) {
-    const target = spans[Math.floor(Math.random()*spans.length)];
-    const wasColor = target.style.color;
-    const colors = ['#ff2244','#ffaa00','#00aaff','#39ff6e'];
-    target.style.color = colors[Math.floor(Math.random()*colors.length)];
-    target.style.opacity = '0.7';
+    const target = spans[Math.floor(Math.random() * spans.length)];
+    const colors = ['#ff2244', '#ffaa00', '#00aaff', '#39ff6e'];
+    target.style.color = colors[Math.floor(Math.random() * colors.length)];
+    target.style.opacity = '0.5';
     setTimeout(() => {
-      target.textContent = Array.from({length: Math.floor(Math.random()*22)+4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+      target.textContent = Array.from({ length: Math.floor(Math.random() * 22) + 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
       target.style.color = '';
       target.style.opacity = '';
-    }, 120);
+    }, 160);
   }
-}, 600);
+}, 1400);
 
-// Canvas glitch bars — draw random coloured horizontal slices over background
+/* ============================================================
+   CANVAS GLITCH BARS
+   ============================================================ */
 const canvas = document.getElementById('glitch-canvas');
 const ctx = canvas.getContext('2d');
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
-
-const glitchColors = [
-  'rgba(57,255,110,0.07)',
-  'rgba(255,34,68,0.09)',
-  'rgba(0,170,255,0.07)',
-  'rgba(255,170,0,0.06)',
-];
-
+const glitchColors = ['rgba(57,255,110,0.07)', 'rgba(255,34,68,0.09)', 'rgba(0,170,255,0.07)', 'rgba(255,170,0,0.06)'];
 function drawGlitch() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (Math.random() > 0.3) {
-    const bars = Math.floor(Math.random()*6)+1;
+    const bars = Math.floor(Math.random() * 6) + 1;
     for (let i = 0; i < bars; i++) {
-      const y = Math.random() * canvas.height;
-      const h = Math.random() * 4 + 1;
-      const col = glitchColors[Math.floor(Math.random()*glitchColors.length)];
-      ctx.fillStyle = col;
-      ctx.fillRect(0, y, canvas.width, h);
+      ctx.fillStyle = glitchColors[Math.floor(Math.random() * glitchColors.length)];
+      ctx.fillRect(0, Math.random() * canvas.height, canvas.width, Math.random() * 4 + 1);
     }
   }
-  // occasional full bright flash bar
-  if (Math.random() > 0.92) {
-    const y = Math.random() * canvas.height;
-    ctx.fillStyle = 'rgba(57,255,110,0.18)';
-    ctx.fillRect(0, y, canvas.width, Math.random()*2+1);
+  if (Math.random() > 0.94) {
+    ctx.fillStyle = 'rgba(57,255,110,0.12)';
+    ctx.fillRect(0, Math.random() * canvas.height, canvas.width, Math.random() * 2 + 1);
   }
-  if (Math.random() > 0.95) {
-    const y = Math.random() * canvas.height;
-    ctx.fillStyle = 'rgba(255,34,68,0.22)';
-    ctx.fillRect(0, y, canvas.width, 1);
+  if (Math.random() > 0.985) {
+    ctx.fillStyle = 'rgba(255,34,68,0.12)';
+    ctx.fillRect(0, Math.random() * canvas.height, canvas.width, 1);
   }
-  setTimeout(drawGlitch, Math.random()*120+40);
+  setTimeout(drawGlitch, Math.random() * 120 + 40);
 }
 drawGlitch();
 
-// Status bar cycling messages
+/* ============================================================
+   VHS TRACKING SWEEP + RGB SPLIT (smooth, non-strobe)
+   ============================================================ */
+const tracking = document.getElementById('tracking');
+function runTracking() {
+  if (document.hidden) return;
+  tracking.classList.remove('run');
+  void tracking.offsetWidth; // restart animation
+  tracking.classList.add('run');
+}
+setInterval(() => { if (Math.random() > 0.35) runTracking(); }, 5200);
+
+function rgbHitHeadings() {
+  const heads = [...document.querySelectorAll('.mac-window.open .win-body h2')];
+  if (!heads.length) return;
+  const h = heads[Math.floor(Math.random() * heads.length)];
+  h.classList.remove('rgb-hit');
+  void h.offsetWidth;
+  h.classList.add('rgb-hit');
+}
+setInterval(() => { if (Math.random() > 0.45) rgbHitHeadings(); }, 4700);
+
+/* ============================================================
+   WINDOW MANAGER
+   ============================================================ */
+let zTop = 200;
+const wins = {
+  about: document.getElementById('win-about'),
+  services: document.getElementById('win-services'),
+  contact: document.getElementById('win-contact'),
+  readme: document.getElementById('win-readme'),
+};
+
+function focusWin(el) {
+  Object.values(wins).forEach(w => w.classList.add('inactive'));
+  el.classList.remove('inactive');
+  el.style.zIndex = ++zTop;
+}
+
+function openWin(name) {
+  const el = wins[name];
+  if (!el) return;
+  el.classList.add('open');
+  el.classList.remove('shaded');
+  focusWin(el);
+  // brief glitch on open
+  el.classList.add('glitching');
+  setTimeout(() => el.classList.remove('glitching'), 240);
+}
+
+function closeWin(el) { el.classList.remove('open'); }
+
+Object.values(wins).forEach(win => {
+  win.addEventListener('pointerdown', () => focusWin(win));
+
+  const bar = win.querySelector('.titlebar');
+  const closeBtn = win.querySelector('[data-win-close]');
+  const shadeBtn = win.querySelector('[data-win-shade]');
+  closeBtn.addEventListener('click', e => { e.stopPropagation(); closeWin(win); });
+  shadeBtn.addEventListener('click', e => { e.stopPropagation(); win.classList.toggle('shaded'); });
+  // classic windowshade: double-click titlebar
+  bar.addEventListener('dblclick', () => win.classList.toggle('shaded'));
+
+  // drag
+  let drag = null;
+  bar.addEventListener('pointerdown', e => {
+    if (e.target.closest('.t-btn')) return;
+    drag = { x: e.clientX - win.offsetLeft, y: e.clientY - win.offsetTop };
+    bar.setPointerCapture(e.pointerId);
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const desk = document.getElementById('desktop');
+    let nx = e.clientX - drag.x;
+    let ny = e.clientY - drag.y;
+    nx = Math.max(-win.offsetWidth + 80, Math.min(nx, desk.clientWidth - 60));
+    ny = Math.max(0, Math.min(ny, desk.clientHeight - 30));
+    win.style.left = nx + 'px';
+    win.style.top = ny + 'px';
+  });
+  const endDrag = () => { drag = null; };
+  bar.addEventListener('pointerup', endDrag);
+  bar.addEventListener('pointercancel', endDrag);
+});
+
+/* random glitch slice on a visible window */
+setInterval(() => {
+  const open = Object.values(wins).filter(w => w.classList.contains('open'));
+  if (open.length && Math.random() > 0.55) {
+    const w = open[Math.floor(Math.random() * open.length)];
+    w.classList.add('glitching');
+    setTimeout(() => w.classList.remove('glitching'), 240);
+  }
+}, 4000);
+
+/* ============================================================
+   DESKTOP ICONS
+   ============================================================ */
+document.querySelectorAll('.desk-icon').forEach(icon => {
+  icon.addEventListener('click', () => {
+    document.querySelectorAll('.desk-icon').forEach(i => i.classList.remove('selected'));
+    icon.classList.add('selected');
+    const t = icon.dataset.open;
+    if (t === 'trash') {
+      showDialog('bombDialog');
+    } else {
+      setTimeout(() => openWin(t), 120);
+    }
+  });
+});
+
+/* buttons inside windows that open other windows */
+document.querySelectorAll('[data-open-win]').forEach(b =>
+  b.addEventListener('click', () => openWin(b.dataset.openWin)));
+
+/* ============================================================
+   MENU BAR
+   ============================================================ */
+const menuItems = document.querySelectorAll('.menu-item[data-menu]');
+function closeMenus() { menuItems.forEach(m => m.classList.remove('open')); }
+menuItems.forEach(m => {
+  m.addEventListener('click', e => {
+    e.stopPropagation();
+    const was = m.classList.contains('open');
+    closeMenus();
+    if (!was) m.classList.add('open');
+  });
+});
+document.addEventListener('click', closeMenus);
+
+function doAction(action) {
+  if (!action) return;
+  if (action.startsWith('open:')) openWin(action.slice(5));
+  else if (action === 'closeAll') Object.values(wins).forEach(closeWin);
+  else if (action === 'reboot') location.reload();
+  else if (action === 'bomb') showDialog('bombDialog');
+  else if (action === 'scramble') scrambleDesktop();
+  else if (action.startsWith('svc:')) {
+    openWin('services');
+    setTimeout(() => toggleSvc(action.slice(4), true), 150);
+  }
+}
+document.querySelectorAll('.dd-item[data-action]').forEach(d =>
+  d.addEventListener('click', () => doAction(d.dataset.action)));
+document.querySelectorAll('[data-action-direct]').forEach(d =>
+  d.addEventListener('click', () => doAction(d.dataset.actionDirect)));
+
+/* keyboard shortcuts: cmd/ctrl 1-3, W */
+document.addEventListener('keydown', e => {
+  if (!(e.metaKey || e.ctrlKey)) return;
+  const map = { '1': 'open:about', '2': 'open:services', '3': 'open:contact', 'w': 'closeAll' };
+  if (map[e.key]) { e.preventDefault(); doAction(map[e.key]); }
+});
+
+/* clock */
+function tickClock() {
+  const d = new Date();
+  document.getElementById('menu-clock').textContent =
+    d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+tickClock();
+setInterval(tickClock, 10000);
+
+/* ============================================================
+   SERVICES finder rows
+   ============================================================ */
+function toggleSvc(id, forceOpen) {
+  const row = document.querySelector(`.finder-row[data-svc="${id}"]`);
+  const desc = document.querySelector(`.finder-desc[data-svc-desc="${id}"]`);
+  const isOpen = desc.classList.contains('show');
+  document.querySelectorAll('.finder-desc').forEach(d => d.classList.remove('show'));
+  document.querySelectorAll('.finder-row').forEach(r => r.classList.remove('expanded'));
+  if (forceOpen || !isOpen) {
+    desc.classList.add('show');
+    row.classList.add('expanded');
+  }
+}
+document.querySelectorAll('.finder-row').forEach(r =>
+  r.addEventListener('click', () => toggleSvc(r.dataset.svc)));
+
+/* "Ask about this" -> opens contact with service preselected */
+document.querySelectorAll('[data-ask]').forEach(b =>
+  b.addEventListener('click', () => {
+    openWin('contact');
+    const sel = document.getElementById('serviceSelect');
+    [...sel.options].forEach(o => {
+      if (o.text.toLowerCase().startsWith(b.dataset.ask.toLowerCase().slice(0, 8))) sel.value = o.value || o.text;
+    });
+    // match by text content
+    [...sel.options].forEach(o => { if (o.text === b.dataset.ask.replace('&amp;', '&')) o.selected = true; });
+  }));
+
+/* ============================================================
+   DIALOGS
+   ============================================================ */
+function showDialog(id) {
+  const d = document.getElementById(id);
+  d.classList.add('open');
+  d.style.zIndex = ++zTop + 10000;
+}
+document.querySelectorAll('[data-dlg-close]').forEach(b =>
+  b.addEventListener('click', () => b.closest('.dialog').classList.remove('open')));
+document.querySelectorAll('[data-dlg-contact]').forEach(b =>
+  b.addEventListener('click', () => {
+    b.closest('.dialog').classList.remove('open');
+    openWin('contact');
+  }));
+
+/* rare spontaneous bomb (memorable, not annoying: once per visit, late) */
+setTimeout(() => {
+  if (Math.random() > 0.5) showDialog('bombDialog');
+}, 90000);
+
+/* scramble desktop easter egg */
+function scrambleDesktop() {
+  document.querySelectorAll('.desk-icon').forEach(i => {
+    i.style.transition = 'all 0.4s steps(5)';
+    i.style.top = (Math.random() * 70 + 5) + '%';
+    i.style.left = (Math.random() * 80 + 2) + '%';
+    i.style.right = 'auto';
+    i.style.bottom = 'auto';
+  });
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
 const statuses = [
   'SIGNAL ACTIVE',
   'CARRIER DETECTED',
@@ -638,22 +1294,27 @@ const statuses = [
   'SIG:ANOMALOUS — NOMINAL',
   'UPTIME: OK',
   'ERR_CORRECTED',
+  'FIRST CHAT FREE — NO JARGON',
 ];
 let si = 0;
 setInterval(() => {
   si = (si + 1) % statuses.length;
-  document.getElementById('statusRight').innerHTML = '<span class="status-blink">▮</span> &nbsp;' + statuses[si];
+  document.getElementById('statusRight').innerHTML =
+    '<span class="status-blink">▮</span> ' + statuses[si];
 }, 4000);
 
-// Contact form — submits to Formspree via fetch so the page doesn't redirect
+/* ============================================================
+   CONTACT FORM (Formspree)
+   ============================================================ */
 const contactForm = document.getElementById('contact-form');
 contactForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const btn = contactForm.querySelector('.send-btn span');
+  const btn = contactForm.querySelector('.send-btn');
   const confirm = document.getElementById('confirm');
-  btn.textContent = '// TRANSMITTING...';
+  btn.textContent = '⏎ TRANSMITTING...';
   contactForm.style.opacity = '0.4';
   contactForm.style.pointerEvents = 'none';
+  document.getElementById('contactStatus').textContent = 'carrier: BUSY';
   try {
     const res = await fetch(contactForm.action, {
       method: 'POST',
@@ -662,7 +1323,7 @@ contactForm.addEventListener('submit', async (e) => {
     });
     if (res.ok) {
       confirm.textContent = '> MESSAGE RECEIVED. EXPECT RESPONSE WITHIN 2 WORKING DAYS._';
-      confirm.style.color = 'var(--green)';
+      confirm.style.color = 'var(--green-dim)';
     } else {
       confirm.textContent = '> ERR: TRANSMISSION FAILED. PLEASE EMAIL DIRECTLY._';
       confirm.style.color = 'var(--red)';
@@ -672,32 +1333,15 @@ contactForm.addEventListener('submit', async (e) => {
     confirm.style.color = 'var(--red)';
   }
   confirm.style.display = 'block';
+  document.getElementById('contactStatus').textContent = 'carrier: OK';
   setTimeout(() => {
     confirm.style.display = 'none';
     contactForm.reset();
     contactForm.style.opacity = '1';
     contactForm.style.pointerEvents = '';
-    btn.textContent = '// TRANSMIT MESSAGE';
+    btn.textContent = '⏎ TRANSMIT';
   }, 7000);
 });
-
-// Occasional full-page horizontal glitch slice
-setInterval(() => {
-  if (Math.random() > 0.6) {
-    const y1 = Math.random()*80 + 5;
-    const h = Math.random()*3 + 1;
-    const shift = (Math.random()-0.5)*18;
-    const el = document.querySelector('.wrapper');
-    el.style.clipPath = `polygon(0 ${y1}%, 100% ${y1}%, 100% ${y1+h}%, 0 ${y1+h}%)`;
-    el.style.transform = `translateX(${shift}px)`;
-    el.style.color = Math.random() > 0.5 ? '#ff2244' : '#00aaff';
-    setTimeout(() => {
-      el.style.clipPath = '';
-      el.style.transform = '';
-      el.style.color = '';
-    }, 80);
-  }
-}, 3000);
 </script>
 </body>
 </html>
