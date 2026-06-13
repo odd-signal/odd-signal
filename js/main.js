@@ -7,7 +7,7 @@
 import './effects.js';
 import './windows.js';
 import { openWin, showDialog } from './windows.js';
-import { openApp, iosBomb } from './ios.js';
+import { openApp, iosBomb, initLockHijack } from './ios.js';
 import { initApps } from './apps.js';
 import { initRival } from './rival.js';
 import { initWidgets } from './widgets.js';
@@ -29,6 +29,9 @@ function setMode() {
 }
 setMode();
 window.addEventListener('resize', setMode);
+
+/* mobile lands on the lock screen — arm the auto "hijack" unlock */
+initLockHijack();
 
 /* ---- contact form (Formspree) ---- */
 const contactForm = document.getElementById('contact-form');

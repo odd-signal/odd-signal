@@ -54,8 +54,8 @@ body {
   text-align: center;
 }
 .sticker.medium { width: 240px; padding: 13px 13px 10px; }
-.sticker.medium .brand { font-size: 30px; letter-spacing: 3px; }
-.sticker.medium .tagline { font-size: 8.5px; letter-spacing: 1.5px; }
+.sticker.medium .brand { font-size: 42px; letter-spacing: 2px; }
+.sticker.medium .payoff { font-size: 12px; }
 .sticker.medium .scanline-hint { font-size: 8px; }
 .sticker.medium .url { font-size: 11px; }
 
@@ -77,25 +77,39 @@ body {
 }
 
 .brand {
+  position: relative;
   font-family: 'VT323', monospace;
-  font-size: 44px;
-  letter-spacing: 5px;
+  font-size: 62px;
+  letter-spacing: 3px;
   color: #fff;
   line-height: 1;
   /* RGB split — static so it prints */
   text-shadow:
-    -2px 0 var(--red),
-    2px 0 var(--blue),
-    0 0 14px rgba(57,255,110,0.9);
-  margin-bottom: 4px;
+    -3px 0 var(--red),
+    3px 0 var(--blue),
+    0 0 16px rgba(57,255,110,0.95);
+  margin-bottom: 8px;
 }
 .brand .blk { color: var(--green); }
+/* torn ghost slice — extra glitch, still print-safe (static) */
+.brand::after {
+  content: attr(data-text);
+  position: absolute; left: 0; right: 0; top: 0;
+  color: var(--green);
+  clip-path: polygon(0 44%, 100% 44%, 100% 62%, 0 62%);
+  transform: translateX(4px);
+  text-shadow: -3px 0 var(--red);
+  opacity: 0.85;
+}
 
-.tagline {
-  font-size: 9.5px;
+.payoff {
+  font-family: 'VT323', monospace;
+  font-size: 17px;
   letter-spacing: 2px;
   color: var(--green);
-  margin-bottom: 12px;
+  line-height: 1.1;
+  margin-top: 8px;
+  text-shadow: 0 0 8px rgba(57,255,110,0.6);
 }
 
 /* QR stays pure black-on-white — never glitch the modules */
@@ -153,12 +167,12 @@ body {
   <div class="sticker">
     <div class="stripes"></div>
     <div class="err-line">// ERR_CARRIER_FOUND · SIG:ANOMALOUS</div>
-    <div class="brand">ODD SIGNAL<span class="blk">█</span></div>
-    <div class="tagline">TECH CONSULTANCY FOR ARTISTS &amp; INDEPENDENTS</div>
+    <div class="brand" data-text="ODD SIGNAL">ODD SIGNAL<span class="blk">█</span></div>
     <div class="qr-box">
       <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&qzone=1&data=https%3A%2F%2Fodd-signal.net" alt="QR code for odd-signal.net" width="220" height="220">
     </div>
     <div class="url">ODD-SIGNAL.NET</div>
+    <div class="payoff">TECHNOLOGICAL SOLUTIONS<br>FOR CREATIVES</div>
     <div class="scanline-hint">&gt; SCAN TO ESTABLISH CONNECTION_</div>
   </div>
 
@@ -166,25 +180,25 @@ body {
   <div class="sticker medium">
     <div class="stripes"></div>
     <div class="err-line">// ERR_CARRIER_FOUND</div>
-    <div class="brand">ODD SIGNAL<span class="blk">█</span></div>
-    <div class="tagline">TECH CONSULTANCY FOR ARTISTS</div>
+    <div class="brand" data-text="ODD SIGNAL">ODD SIGNAL<span class="blk">█</span></div>
     <div class="qr-box">
       <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&qzone=1&data=https%3A%2F%2Fodd-signal.net" alt="QR code for odd-signal.net" width="150" height="150">
     </div>
     <div class="url">ODD-SIGNAL.NET</div>
-    <div class="scanline-hint">&gt; SCAN ME_</div>
+    <div class="payoff">TECHNOLOGICAL SOLUTIONS<br>FOR CREATIVES</div>
+    <div class="scanline-hint">&gt; SCAN ME · FIRST CHAT FREE_</div>
   </div>
 
   <div class="sticker medium">
     <div class="stripes"></div>
     <div class="err-line">// SIG:ANOMALOUS</div>
-    <div class="brand">ODD SIGNAL<span class="blk">█</span></div>
-    <div class="tagline">AI · WEBSITES · HARDWARE ART</div>
+    <div class="brand" data-text="ODD SIGNAL">ODD SIGNAL<span class="blk">█</span></div>
     <div class="qr-box">
       <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&qzone=1&data=https%3A%2F%2Fodd-signal.net" alt="QR code for odd-signal.net" width="150" height="150">
     </div>
     <div class="url">ODD-SIGNAL.NET</div>
-    <div class="scanline-hint">&gt; FIRST CHAT FREE_</div>
+    <div class="payoff">TECHNOLOGICAL SOLUTIONS<br>FOR CREATIVES</div>
+    <div class="scanline-hint">&gt; AI · WEBSITES · HARDWARE ART_</div>
   </div>
 
 </div>
