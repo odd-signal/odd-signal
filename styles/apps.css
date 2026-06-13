@@ -1,0 +1,145 @@
+/* ============================================================
+   GLITCH-CONTROL APPS — Cleaner (down), keygen.dmg (up),
+   popup storm, conversion toast
+   Shared between Mac windows and iOS apps.
+   ============================================================ */
+
+/* ---- Cleaner / Disk Doctor ---- */
+.cleaner {
+  font-family: var(--mono);
+}
+.cleaner .lcd {
+  background: #06140b;
+  border: 1px solid var(--mac-black);
+  box-shadow: inset 0 0 12px rgba(57,255,110,0.18);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.cleaner .readout {
+  color: var(--green);
+  font-size: 12px;
+  letter-spacing: 1px;
+  min-height: 18px;
+  text-shadow: 0 0 6px rgba(57,255,110,0.5);
+}
+/* defrag grid — fills green as it "repairs" */
+.defrag {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 2px;
+  margin-top: 10px;
+}
+.defrag i {
+  aspect-ratio: 1;
+  background: #123;
+  display: block;
+  transition: background 0.12s;
+}
+.defrag i.bad  { background: var(--red); }
+.defrag i.work { background: var(--amber); }
+.defrag i.ok   { background: var(--green); }
+
+.cleaner .meter {
+  height: 14px; border: 1px solid var(--mac-black);
+  background: #06140b; margin-top: 10px; padding: 2px;
+}
+.cleaner .meter > i {
+  display: block; height: 100%; width: 0%;
+  background: repeating-linear-gradient(90deg, var(--green) 0 6px, var(--green-dim) 6px 8px);
+  transition: width 0.25s steps(6);
+}
+.app-body .cleaner .lcd { background: #06140b; }
+
+/* big action buttons reused in both modes */
+.app-action {
+  font-family: var(--mac-font);
+  font-size: 15px; letter-spacing: 1px;
+  border: 2px solid var(--mac-black); border-radius: 8px;
+  padding: 9px 18px; cursor: pointer; width: 100%;
+  box-shadow: 2px 2px 0 var(--mac-black);
+  background: linear-gradient(180deg, #eafff0, #b6e9c6);
+  color: #07320f;
+}
+.app-action:active { box-shadow: none; transform: translate(2px,2px); }
+.app-action.danger {
+  background: linear-gradient(180deg, #ffd6d6, #ff8a8a);
+  color: #3a0000;
+}
+.app-action[disabled] { opacity: 0.5; pointer-events: none; }
+
+/* ---- keygen.dmg (fake warez keygen) ---- */
+.keygen {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(57,255,110,0.10), transparent 60%),
+    linear-gradient(180deg, #1a1030, #0a0618);
+  border: 1px solid #44307a;
+  color: #d7c8ff;
+  padding: 14px;
+  font-family: var(--mono);
+  text-align: center;
+}
+.keygen .kg-title {
+  font-family: 'VT323', monospace; font-size: 26px; letter-spacing: 2px;
+  color: #b69bff; text-shadow: 0 0 10px rgba(150,120,255,0.8);
+}
+.keygen .kg-crew { font-size: 10px; letter-spacing: 4px; color: #6a52a8; margin-bottom: 10px; }
+.keygen .kg-serial {
+  background: #060312; border: 1px solid #44307a; color: var(--green);
+  font-size: 13px; letter-spacing: 2px; padding: 8px; margin: 8px 0;
+  min-height: 16px; word-break: break-all;
+  text-shadow: 0 0 6px rgba(57,255,110,0.5);
+}
+.keygen .kg-warn { font-size: 10px; color: var(--red); letter-spacing: 1px; margin-top: 8px; }
+.keygen .app-action { background: linear-gradient(180deg, #9a7bff, #5a36c8); color: #fff; border-color: #2a1860; }
+
+/* ---- POPUP STORM ---- */
+#storm { position: fixed; inset: 0; z-index: 41000; pointer-events: none; display: none; }
+#storm.on { display: block; }
+.popup {
+  position: absolute;
+  pointer-events: auto;
+  min-width: 180px; max-width: 240px;
+  background: var(--plat-light);
+  border: 2px solid var(--mac-black);
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
+  font-family: var(--mac-font);
+  color: var(--mac-black);
+  font-size: 12px;
+}
+.popup .pu-bar {
+  background: linear-gradient(180deg, #6db3e8, #16548f);
+  color: #fff; padding: 3px 8px; font-size: 11px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.popup .pu-x {
+  width: 12px; height: 12px; line-height: 10px; text-align: center;
+  border: 1px solid #0a3a66; background: #cfe6fb; color: #0a3a66; cursor: pointer; font-size: 10px;
+}
+.popup .pu-body { padding: 12px 12px 14px; display: flex; gap: 10px; align-items: center; }
+.popup .pu-ico { font-size: 26px; line-height: 1; }
+.popup .pu-msg { font-size: 12px; line-height: 1.45; }
+.popup.shake { animation: puShake 0.18s steps(2) infinite; }
+@keyframes puShake {
+  0% { transform: translate(0,0) rotate(0); }
+  50% { transform: translate(-2px,2px) rotate(-0.5deg); }
+  100% { transform: translate(2px,-1px) rotate(0.5deg); }
+}
+
+/* ---- conversion TOAST (Cleaner → calm hook) ---- */
+#toast {
+  position: fixed;
+  left: 50%; bottom: 44px; transform: translate(-50%, 140%);
+  z-index: 42000;
+  background: rgba(6,20,11,0.95);
+  border: 1px solid var(--green);
+  box-shadow: 0 0 24px rgba(57,255,110,0.35);
+  color: var(--text);
+  font-family: var(--mono); font-size: 13px; letter-spacing: 1px;
+  padding: 11px 18px; border-radius: 4px;
+  cursor: pointer; max-width: 90vw;
+  transition: transform 0.4s cubic-bezier(.2,.8,.2,1), opacity 0.4s;
+  opacity: 0;
+}
+#toast.show { transform: translate(-50%, 0); opacity: 1; }
+#toast .arrow { color: var(--green); }
+body.mode-ios #toast { bottom: 84px; }

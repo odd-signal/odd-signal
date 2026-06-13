@@ -1,0 +1,279 @@
+/* ============================================================
+   BASE — vars, body, CRT overlays, background glitch layers
+   glitch-level gating + reduced-motion safety
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --green: #39ff6e;
+  --green-dim: #1a7a38;
+  --green-faint: #0d2e18;
+  --red: #ff2244;
+  --amber: #ffaa00;
+  --blue: #00aaff;
+  --bg: #030a05;
+  --scanline: rgba(0,0,0,0.18);
+  --text: #b8ffcc;
+  --text-dim: #4a8a5a;
+
+  /* Classic Mac platinum palette */
+  --plat: #dddddd;
+  --plat-light: #f4f4f4;
+  --plat-dark: #999999;
+  --plat-darker: #555555;
+  --mac-black: #111111;
+  --titlebar-h: 24px;
+  --menubar-h: 26px;
+
+  --mac-font: 'Pixelify Sans', 'Share Tech Mono', monospace;
+  --mono: 'Share Tech Mono', monospace;
+}
+
+html { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+/* CRT scanlines overlay — always on, it's the calm floor */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline) 2px,
+    var(--scanline) 4px
+  );
+  pointer-events: none;
+  z-index: 99999;
+}
+
+/* Vignette */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
+  z-index: 99998;
+}
+
+::selection { background: var(--green); color: var(--bg); }
+
+/* ============================================================
+   BOOT SCREEN
+   ============================================================ */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  z-index: 50000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  cursor: pointer;
+  transition: opacity 0.5s;
+}
+#boot.done { opacity: 0; pointer-events: none; }
+
+.boot-mac {
+  width: 120px;
+  height: 150px;
+  border: 3px solid var(--green);
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(57,255,110,0.4), inset 0 0 14px rgba(57,255,110,0.15);
+  animation: bootMacGlitch 4s step-end infinite;
+}
+.boot-mac .screen {
+  position: absolute;
+  inset: 12px 12px 40px 12px;
+  border: 2px solid var(--green);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 44px;
+  color: var(--green);
+  text-shadow: 0 0 12px rgba(57,255,110,0.8);
+  overflow: hidden;
+}
+.boot-mac .slot {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 4px;
+  background: var(--green-dim);
+}
+@keyframes bootMacGlitch {
+  0%, 90% { transform: none; filter: none; }
+  91% { transform: translateX(-4px) skewX(-3deg); filter: hue-rotate(120deg); }
+  92% { transform: translateX(3px); filter: none; }
+  93%, 100% { transform: none; }
+}
+
+.boot-title {
+  font-family: 'VT323', monospace;
+  font-size: 34px;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(57,255,110,0.8);
+}
+.boot-title .v { color: var(--green-dim); font-size: 18px; letter-spacing: 3px; }
+
+.boot-bar {
+  width: min(360px, 76vw);
+  height: 16px;
+  border: 2px solid var(--green);
+  padding: 2px;
+  box-shadow: 0 0 14px rgba(57,255,110,0.3);
+}
+.boot-bar .fill {
+  height: 100%;
+  width: 0%;
+  background: repeating-linear-gradient(90deg, var(--green) 0 8px, var(--green-dim) 8px 10px);
+  transition: width 0.18s steps(4);
+}
+
+.boot-log {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  height: 92px;
+  width: min(360px, 76vw);
+  overflow: hidden;
+  text-align: left;
+}
+.boot-log .ok { color: var(--green); }
+.boot-log .err { color: var(--red); }
+
+.boot-skip {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  animation: blink 1.2s step-end infinite;
+}
+
+/* ============================================================
+   BACKGROUND NOISE + GLITCH CANVAS
+   ============================================================ */
+.bg-noise {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-noise span {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green-dim);
+  opacity: 0.32;
+  user-select: none;
+  animation: bgFlicker 4.5s step-end infinite;
+}
+@keyframes bgFlicker {
+  0%, 90% { opacity: 0.3; color: var(--green-dim); }
+  91%, 93% { opacity: 0.16; }
+  94% { opacity: 0.42; color: var(--amber); }
+  95%, 100% { opacity: 0.3; color: var(--green-dim); }
+}
+
+#glitch-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.85;
+  transition: opacity 0.6s;
+}
+
+/* VHS tracking sweep — smooth band drifting down screen */
+#tracking {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  height: 72px;
+  transform: translateY(-90px);
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: linear-gradient(180deg,
+    transparent,
+    rgba(0,170,255,0.06) 44%,
+    rgba(255,255,255,0.07) 50%,
+    rgba(255,34,68,0.06) 56%,
+    transparent);
+  box-shadow: 0 0 18px rgba(57,255,110,0.05);
+}
+#tracking.run { animation: trackSweep 1.7s linear 1; }
+@keyframes trackSweep {
+  0%   { transform: translateY(-90px); opacity: 0; }
+  8%   { opacity: 0.65; }
+  50%  { opacity: 0.5; }
+  92%  { opacity: 0.65; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* RGB chromatic split — brief, on headings */
+@keyframes rgbSplit {
+  0%   { text-shadow: none; transform: none; }
+  25%  { text-shadow: -2px 0 var(--red), 2px 0 var(--blue); transform: translateX(1px); }
+  50%  { text-shadow: 2px 0 var(--blue), -2px 0 var(--red); transform: translateX(-1px); }
+  75%  { text-shadow: -1px 0 var(--red), 1px 0 var(--blue); transform: translateX(1px); }
+  100% { text-shadow: none; transform: none; }
+}
+.rgb-hit { animation: rgbSplit 0.42s steps(4) 1; }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ============================================================
+   GLITCH-LEVEL gating for CSS-driven effects
+   data-glitch set by the engine (0..3). Lower = calmer.
+   ============================================================ */
+/* level 0 = "cleaned": ambient CRT only — slow, faint, no colour pops */
+body[data-glitch="0"] .bg-noise span { animation-duration: 14s; opacity: 0.14; }
+body[data-glitch="0"] #glitch-canvas { opacity: 0.25; }
+body[data-glitch="0"] .menu-logo,
+body[data-glitch="0"] .boot-mac { animation: none; }
+
+body[data-glitch="1"] .bg-noise span { animation-duration: 9s; opacity: 0.2; }
+body[data-glitch="1"] #glitch-canvas { opacity: 0.5; }
+
+body[data-glitch="2"] .bg-noise span { animation-duration: 6s; }
+
+/* ============================================================
+   REDUCED MOTION — hard safety: kill all keyframe motion.
+   Look is preserved (colour, scanlines, static noise); movement gone.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .bg-noise span,
+  .boot-mac,
+  .menu-logo,
+  #tracking,
+  .rgb-hit,
+  #slider-label,
+  .status-blink,
+  .mac-window.glitching,
+  .form-jerk,
+  .popup.shake { animation: none !important; }
+  #glitch-canvas { opacity: 0.4; }
+  html { scroll-behavior: auto; }
+}
