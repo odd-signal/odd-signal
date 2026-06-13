@@ -1,0 +1,8 @@
+# Cloudflare Pages headers
+# ES modules + CSS are cached by URL; filenames don't change between
+# deploys, so browsers reuse stale copies and a deploy looks half-applied
+# (e.g. desktop updated, phone still on the old bundle). `no-cache` keeps
+# the file but forces a revalidation each load: unchanged files return a
+# cheap 304, changed files download fresh. No more stuck-stale visitors.
+/*
+  Cache-Control: no-cache
