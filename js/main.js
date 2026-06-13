@@ -9,6 +9,9 @@ import './windows.js';
 import { openWin, showDialog } from './windows.js';
 import { openApp, iosBomb } from './ios.js';
 import { initApps } from './apps.js';
+import { initRival } from './rival.js';
+import { initWidgets } from './widgets.js';
+import { initGoblin } from './goblin.js';
 import { initBoot } from './boot.js';
 import { initGlitch, isMobile } from './glitch.js';
 
@@ -66,8 +69,11 @@ contactForm.addEventListener('submit', async (e) => {
   }, 7000);
 });
 
-/* ---- apps (cleaner / keygen / storm / hooks) ---- */
+/* ---- apps + rival + furniture + mascot ---- */
 initApps();
+initRival();
+initWidgets();
+initGoblin();
 
 /* ---- boot → desktop, then funnel (desktop only; iOS funnels post-unlock) ---- */
 initBoot(() => {
