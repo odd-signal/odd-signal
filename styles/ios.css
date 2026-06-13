@@ -47,10 +47,46 @@ body.mode-ios { cursor: default; }
 .lock-flex { flex: 1; display: flex; align-items: center; justify-content: center; }
 .lock-sig {
   font-family: 'VT323', monospace; color: var(--green);
-  font-size: 24px; letter-spacing: 5px; text-align: center; line-height: 1.7;
-  text-shadow: 0 0 16px rgba(57,255,110,0.7);
+  text-align: center; line-height: 1.4;
 }
-.lock-sig small { font-size: 13px; letter-spacing: 3px; color: var(--text-dim); display: block; }
+.lock-brand {
+  display: block; position: relative;
+  font-size: clamp(42px, 14vw, 62px);
+  letter-spacing: 4px; line-height: 1;
+  color: #eafff0;
+  text-shadow: -2px 0 var(--red), 2px 0 var(--blue), 0 0 18px rgba(57,255,110,0.85);
+}
+.lock-brand::after {
+  content: attr(data-text);
+  position: absolute; left: 0; right: 0; top: 0;
+  color: var(--green);
+  clip-path: polygon(0 42%, 100% 42%, 100% 60%, 0 60%);
+  transform: translateX(3px);
+  text-shadow: -2px 0 var(--red);
+  opacity: 0.85; pointer-events: none;
+}
+.lock-sig small { font-size: 12px; letter-spacing: 3px; color: var(--text-dim); display: block; margin-top: 16px; }
+
+/* signal "hijacks" the lock and forces it open */
+@keyframes hijackShake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-5px, 1px) skewX(2deg); }
+  40% { transform: translate(4px, -2px); }
+  60% { transform: translate(-3px, 2px) skewX(-2deg); }
+  80% { transform: translate(3px, 1px); }
+}
+#lockscreen.hijacking { animation: hijackShake 0.11s steps(2) infinite; }
+#lockscreen.hijacking #slider-label {
+  color: var(--red) !important;
+  -webkit-text-fill-color: var(--red);
+  background: none; letter-spacing: 2px;
+}
+#lockscreen.hijacking #slider-track {
+  box-shadow: inset 0 0 0 1.5px var(--red), inset 0 2px 9px #000;
+}
+@media (prefers-reduced-motion: reduce) {
+  #lockscreen.hijacking { animation: none; }
+}
 
 .unlock-tray {
   background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.8));

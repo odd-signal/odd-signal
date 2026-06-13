@@ -60,7 +60,14 @@ const sliderLabel = document.getElementById('slider-label');
 let unlockedOnce = false;
 let sdrag = null;
 
+/* auto "hijack" — the signal seizes the phone if the user just stares */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let hijackTimer = null;
+let didUnlock = false;
+function cancelHijack() { if (hijackTimer) { clearTimeout(hijackTimer); hijackTimer = null; } }
+
 sliderThumb.addEventListener('pointerdown', e => {
+  cancelHijack(); // user took control — no auto-seize mid-drag
   sdrag = { x: e.clientX, dx: 0, max: sliderTrack.clientWidth - sliderThumb.offsetWidth - 8 };
   sliderThumb.style.transition = 'none';
   sliderThumb.setPointerCapture(e.pointerId);
@@ -85,6 +92,8 @@ sliderThumb.addEventListener('pointerup', sliderEnd);
 sliderThumb.addEventListener('pointercancel', sliderEnd);
 
 function unlock() {
+  didUnlock = true;
+  cancelHijack();
   lockscreen.classList.add('unlocked');
   if (!unlockedOnce) {
     unlockedOnce = true;
@@ -102,6 +111,26 @@ registerTimed(6000, () => {
   sliderLabel.textContent = alts[Math.floor(Math.random() * alts.length)];
   setTimeout(() => { sliderLabel.textContent = 'slide to unlock'; }, 900);
 });
+
+/* drives the thumb across with a glitchy jerk, then unlocks */
+function hijackUnlock() {
+  if (didUnlock || lockscreen.classList.contains('unlocked')) return;
+  if (reduceMotion) { sliderLabel.textContent = 'signal seized'; unlock(); return; }
+  lockscreen.classList.add('hijacking');
+  sliderLabel.style.animation = 'none';
+  sliderLabel.textContent = '// SIGNAL HIJACKED';
+  const max = sliderTrack.clientWidth - sliderThumb.offsetWidth - 8;
+  sliderThumb.style.transition = 'transform 0.5s steps(7)';
+  sliderThumb.style.transform = `translateX(${max}px)`;
+  setTimeout(() => { lockscreen.classList.remove('hijacking'); unlock(); }, 620);
+}
+
+/* armed by main.js once the mode is known; ~4s gives time to read the brand */
+export function initLockHijack() {
+  if (!isIOS() || didUnlock) return;
+  cancelHijack();
+  hijackTimer = setTimeout(hijackUnlock, 4200);
+}
 
 /* ---- app open/close ---- */
 export function openApp(name) {
