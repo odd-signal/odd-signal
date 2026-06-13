@@ -125,11 +125,23 @@ function hijackUnlock() {
   setTimeout(() => { lockscreen.classList.remove('hijacking'); unlock(); }, 620);
 }
 
-/* armed by main.js once the mode is known; ~4s gives time to read the brand */
-export function initLockHijack() {
-  if (!isIOS() || didUnlock) return;
+function armHijack() {
+  if (!isIOS() || didUnlock || lockscreen.classList.contains('unlocked')) return;
   cancelHijack();
   hijackTimer = setTimeout(hijackUnlock, 4200);
+}
+
+/* armed by main.js once the mode is known; ~4s gives time to read the brand.
+   QR scanners often open the page in a background tab, where browsers throttle
+   or suspend timers — so we also pause the countdown while hidden and (re)start
+   it whenever the page becomes visible, so it fires ~4s into the user actually
+   looking at the lock screen rather than ~4s into a suspended background load. */
+export function initLockHijack() {
+  armHijack();
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) cancelHijack();
+    else armHijack();
+  });
 }
 
 /* ---- app open/close ---- */
