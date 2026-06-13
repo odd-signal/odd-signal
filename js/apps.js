@@ -9,6 +9,7 @@
 import { getLevel, setLevel, stepLevel, isMax, onLevel } from './glitch.js';
 import { openWin, showDialog } from './windows.js';
 import { openApp, iosAlertShow } from './ios.js';
+import { showNWAd, NW_POPUPS } from './rival.js';
 
 const isIOS = () => document.body.classList.contains('mode-ios');
 function openContact() { isIOS() ? openApp('contact') : openWin('contact'); }
@@ -112,23 +113,26 @@ const POPUPS = [
   ['✉', "YOU'VE GOT MAIL"],
   ['💿', 'CORRUPTED DISC'],
   ['🧠', 'DOWNLOAD MORE RAM'],
-  ['☣', 'VIRUS DETECTED (x47)'],
+  ['☣', 'ВИРУС DETECTED (x47)'],
   ['🐌', 'Your computer is 100% SLOW'],
-  ['🎁', 'CONGRATULATIONS — CLICK TO WIN'],
+  ['🎁', 'ПОЗДРАВЛЯЕМ — CLICK TO WIN'],
   ['🗑', 'SYSTEM32 has been deleted'],
   ['❓', 'Cn yu evn rd ths popup'],
   ['🍎', 'FREE iPod — claim now'],
   ['💾', 'DISK FULL: 0 bytes free'],
-  ['💥', 'reality.exe has stopped responding'],
+  ['💥', 'реальность.exe has stopped responding'],
 ];
 let storming = false;
 function popupStorm() {
+  // iOS havoc = the goblin's NORMAL WAVELENGTH takeover (not win95 popups)
+  if (isIOS()) { showNWAd(); return; }
   if (storming) return;
   storming = true;
   stormEl.classList.add('on');
+  const pool = POPUPS.concat(NW_POPUPS);
   const n = 9 + Math.floor(Math.random() * 4);
   for (let i = 0; i < n; i++) {
-    const [ico, msg] = POPUPS[Math.floor(Math.random() * POPUPS.length)];
+    const [ico, msg] = pool[Math.floor(Math.random() * pool.length)];
     const p = document.createElement('div');
     p.className = 'popup shake';
     p.style.left = Math.random() * 70 + 4 + 'vw';
