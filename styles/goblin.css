@@ -1,0 +1,196 @@
+/* ============================================================
+   goblin.css — the mascot, NORMAL WAVELENGTH rival, desktop
+   furniture (sticky note, signal meter, wallpaper)
+   ============================================================ */
+
+/* ============================================================
+   DESKTOP WALLPAPER — kills the void cheaply (desktop only)
+   ============================================================ */
+#desktop {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(57,255,110,0.035) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(57,255,110,0.035) 31px 32px);
+}
+#wallmark {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 22vw; line-height: 0.8; letter-spacing: 1vw;
+  color: rgba(57,255,110,0.035);
+  user-select: none; overflow: hidden; text-align: center;
+}
+
+/* ============================================================
+   STICKY NOTE — physical gravity-to-contact (desktop only)
+   ============================================================ */
+#sticky {
+  position: absolute; z-index: 8;
+  width: 168px; padding: 14px 14px 18px;
+  background: linear-gradient(180deg, #fdf06b, #f4e24a);
+  color: #3a2f0a;
+  font-family: 'Marker Felt', 'Comic Sans MS', cursive;
+  font-size: 15px; line-height: 1.35;
+  box-shadow: 2px 4px 9px rgba(0,0,0,0.5);
+  transform: rotate(-4deg);
+  cursor: pointer;
+  border-bottom: 22px solid #ead63f;
+}
+#sticky::before {
+  content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+  width: 56px; height: 16px; background: rgba(200,180,120,0.55);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+#sticky b { display: block; font-size: 13px; margin-top: 6px; color: #6a1010; }
+#sticky:hover { transform: rotate(-4deg) scale(1.04); }
+#sticky:active { transform: rotate(-4deg) scale(0.98); }
+
+/* ============================================================
+   SIGNAL METER — reflects glitchLevel (desktop only)
+   ============================================================ */
+#meter-widget {
+  position: absolute; z-index: 8;
+  width: 184px;
+  background: var(--plat);
+  border: 1px solid var(--mac-black);
+  box-shadow: inset 1px 1px 0 var(--plat-light), inset -1px -1px 0 var(--plat-dark), 3px 3px 0 rgba(0,0,0,0.45);
+  font-family: var(--mac-font); color: var(--mac-black);
+  user-select: none;
+}
+#meter-widget .mw-bar {
+  height: 16px; padding: 0 5px;
+  background: linear-gradient(180deg, var(--plat-light), var(--plat));
+  border-bottom: 1px solid var(--mac-black);
+  font-size: 11px; display: flex; align-items: center; letter-spacing: 1px;
+}
+#meter-widget .mw-body { padding: 9px 10px; background: #06140b; }
+#meter-widget .mw-label { font-size: 10px; color: var(--green); letter-spacing: 1px; margin-bottom: 5px; }
+.mw-track { height: 12px; background: #021006; border: 1px solid #093; padding: 1px; }
+.mw-fill { height: 100%; width: 100%; transition: width 0.4s steps(8), background 0.4s; }
+#meter-widget .mw-readout { font-size: 9px; color: var(--text-dim); margin-top: 5px; letter-spacing: 1px; }
+
+/* ============================================================
+   THE GOBLIN
+   ============================================================ */
+#goblin {
+  position: fixed;
+  right: 22px; bottom: 40px;
+  z-index: 9000;
+  width: 96px; height: 96px;
+  display: none;
+  cursor: pointer;
+  filter: drop-shadow(0 0 10px rgba(57,255,110,0.55));
+  transform-origin: bottom center;
+  transition: transform 0.5s cubic-bezier(.2,1.2,.4,1), filter 0.4s;
+  touch-action: manipulation;
+}
+#goblin.show { display: block; }
+#goblin svg { width: 100%; height: 100%; display: block; }
+#goblin.jitter { animation: gobJitter 0.16s steps(2) infinite; }
+@keyframes gobJitter {
+  0% { transform: translate(0,0) scale(var(--gob-scale,1)); }
+  50% { transform: translate(-2px,1px) scale(var(--gob-scale,1)) skewX(-1deg); }
+  100% { transform: translate(2px,-1px) scale(var(--gob-scale,1)); }
+}
+#goblin.pop { animation: gobPop 0.45s cubic-bezier(.2,1.4,.4,1) 1; }
+@keyframes gobPop {
+  0% { transform: scale(0.1) rotate(-20deg); opacity: 0; }
+  70% { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  100% { transform: scale(var(--gob-scale,1)); opacity: 1; }
+}
+/* level-scaled size: the goblin IS the glitchLevel */
+body[data-glitch="0"] #goblin { --gob-scale: 0.55; filter: drop-shadow(0 0 4px rgba(57,255,110,0.25)) grayscale(0.5); }
+body[data-glitch="1"] #goblin { --gob-scale: 0.8; }
+body[data-glitch="2"] #goblin { --gob-scale: 1.0; }
+body[data-glitch="3"] #goblin { --gob-scale: 1.25; }
+#goblin { transform: scale(var(--gob-scale,1)); }
+
+/* goblin glow eyes pulse */
+.gob-eye { animation: gobEye 1.4s ease-in-out infinite; }
+@keyframes gobEye { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+.gob-spark { animation: gobSpark 0.9s step-end infinite; }
+@keyframes gobSpark { 0%,70% { opacity: 0; } 71%,80% { opacity: 1; } 81%,100% { opacity: 0; } }
+
+/* speech bubble */
+#gob-bubble {
+  position: fixed;
+  z-index: 9001;
+  max-width: 230px;
+  background: #06140b;
+  border: 1px solid var(--green);
+  box-shadow: 0 0 16px rgba(57,255,110,0.4);
+  color: var(--text);
+  font-family: var(--mono); font-size: 13px; line-height: 1.4;
+  padding: 9px 12px;
+  display: none;
+}
+#gob-bubble.show { display: block; animation: bubbleIn 0.16s steps(2); }
+@keyframes bubbleIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+#gob-bubble .gob-cy { color: var(--amber); }
+#gob-bubble .gob-go {
+  display: inline-block; margin-top: 7px;
+  color: var(--green); border-bottom: 1px solid var(--green);
+  cursor: pointer; letter-spacing: 1px;
+}
+#gob-bubble .gob-go:hover { background: var(--green); color: var(--bg); }
+#gob-bubble::after {
+  content: ''; position: absolute; bottom: -7px; right: 26px;
+  border: 7px solid transparent; border-top-color: var(--green); border-bottom: 0;
+}
+
+/* ============================================================
+   NORMAL WAVELENGTH — full-screen iOS interstitial (and desktop)
+   Deliberately sterile corporate: clashes with the green CRT.
+   ============================================================ */
+#nw-ad {
+  position: fixed; inset: 0; z-index: 43000;
+  display: none;
+  background: linear-gradient(180deg, #eef2f7, #d7dee8);
+  color: #16202e;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: max(34px, env(safe-area-inset-top)) 22px max(28px, env(safe-area-inset-bottom));
+}
+#nw-ad.open { display: block; animation: nwIn 0.25s ease; }
+@keyframes nwIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+.nw-wrap { max-width: 440px; margin: 0 auto; }
+.nw-sponsor { font-size: 10px; letter-spacing: 2px; color: #8a97a8; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; gap: 7px; }
+.nw-sponsor .gob-mini { width: 18px; height: 18px; }
+.nw-logo { font-size: 30px; font-weight: 800; letter-spacing: -1px; color: #16314f; }
+.nw-logo span { color: #2f7fe0; }
+.nw-tag { font-size: 13px; color: #5a6a7c; font-style: italic; margin: 2px 0 22px; }
+.nw-lede { font-size: 20px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+.nw-jab { font-size: 14px; color: #6a7889; margin-bottom: 20px; }
+.nw-feats { list-style: none; margin: 0 0 20px; padding: 0; }
+.nw-feats li { font-size: 14px; padding: 8px 0; border-bottom: 1px solid #c4cedb; display: flex; gap: 9px; }
+.nw-feats li::before { content: '▸'; color: #2f7fe0; }
+.nw-stars { font-size: 13px; color: #6a7889; margin-bottom: 18px; }
+.nw-price {
+  background: #16314f; color: #fff; border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 18px;
+}
+.nw-price .big { font-size: 22px; font-weight: 800; }
+.nw-price .small { font-size: 11px; color: #aebfd6; margin-top: 4px; }
+.nw-cta {
+  width: 100%; border: 0; border-radius: 10px;
+  background: linear-gradient(180deg, #3f93f0, #1f63c0);
+  color: #fff; font-size: 17px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 15px; cursor: pointer; box-shadow: 0 3px 0 #134a96;
+}
+.nw-cta:active { transform: translateY(2px); box-shadow: 0 1px 0 #134a96; }
+.nw-fine { font-size: 9.5px; color: #97a3b3; line-height: 1.5; margin-top: 16px; }
+.nw-close {
+  position: absolute; top: max(12px, env(safe-area-inset-top)); right: 14px;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid #b7c1cf; background: #fff; color: #5a6a7c;
+  font-size: 16px; cursor: pointer; line-height: 28px; text-align: center;
+  z-index: 1;
+}
+.nw-decline {
+  display: block; width: 100%; text-align: center; margin-top: 14px;
+  background: none; border: 0; color: #8a97a8; font-size: 13px; cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #goblin.jitter, .gob-eye, .gob-spark, #goblin.pop, #nw-ad.open { animation: none !important; }
+}

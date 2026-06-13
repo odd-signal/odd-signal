@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="styles/mac.css">
 <link rel="stylesheet" href="styles/ios.css">
 <link rel="stylesheet" href="styles/apps.css">
+<link rel="stylesheet" href="styles/goblin.css">
 </head>
 <body>
 
@@ -81,6 +82,24 @@
 
 <!-- DESKTOP -->
 <div id="desktop">
+
+  <!-- faint wallpaper watermark -->
+  <div id="wallmark">ODD<br>SIGNAL</div>
+
+  <!-- furniture: fills the void, every piece earns its pixels -->
+  <div id="meter-widget" style="top: 40px; left: 50%; transform: translateX(-50%);">
+    <div class="mw-bar">◈ signal.monitor</div>
+    <div class="mw-body">
+      <div class="mw-label">SIGNAL INTEGRITY</div>
+      <div class="mw-track"><div class="mw-fill"></div></div>
+      <div class="mw-readout">> INTEGRITY NOMINAL</div>
+    </div>
+  </div>
+
+  <div id="sticky" style="top: 210px; left: 44%;">
+    note to self:
+    <b>don't forget — get in touch →</b>
+  </div>
 
   <!-- bottom-left icons: the glitch controls (kept clear of default window spawn) -->
   <div class="desk-icon" data-open="cleaner" style="bottom: 114px; left: 16px;">
@@ -517,6 +536,28 @@
 <!-- POPUP STORM overlay + conversion toast -->
 <div id="storm"></div>
 <div id="toast"></div>
+
+<!-- NORMAL WAVELENGTH full-screen ad (content injected by rival.js) -->
+<div id="nw-ad"></div>
+
+<!-- THE GOBLIN (mascot / face of glitchLevel) -->
+<div id="goblin" aria-label="Odd Signal goblin" role="img">
+  <svg viewBox="0 0 64 64">
+    <path d="M10 22 L21 9 L23 31 Z" fill="#1a7a38" stroke="#073" stroke-width="1.5"/>
+    <path d="M54 22 L43 9 L41 31 Z" fill="#1a7a38" stroke="#073" stroke-width="1.5"/>
+    <path d="M16 26 Q16 13 32 13 Q48 13 48 26 L48 40 Q48 53 32 53 Q16 53 16 40 Z" fill="#239a47" stroke="#073" stroke-width="2"/>
+    <path d="M20 28 L30 32 M44 28 L34 32" stroke="#06371a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle class="gob-eye" cx="25" cy="34" r="4.2" fill="#eaffd6"/>
+    <circle class="gob-eye" cx="39" cy="34" r="4.2" fill="#eaffd6"/>
+    <circle cx="25.5" cy="34.5" r="1.7" fill="#0a2a12"/>
+    <circle cx="38.5" cy="34.5" r="1.7" fill="#0a2a12"/>
+    <path d="M23 43 L27 47 L31 43 L35 47 L39 43 L41 45" stroke="#06371a" stroke-width="2" fill="none"/>
+    <path d="M25 43.5 L27 45.5 L29 43.5 Z M33 43.5 L35 45.5 L37 43.5 Z" fill="#eaffd6"/>
+    <path class="gob-spark" d="M52 15 l3 -7 l-1 5 l4 -2 l-5 6 Z" fill="#ffaa00"/>
+    <path class="gob-spark" d="M11 13 l-3 -7 l1 5 l-4 -2 l5 6 Z" fill="#00aaff"/>
+  </svg>
+</div>
+<div id="gob-bubble"></div>
 
 <!-- STATUS BAR -->
 <div class="status-line">
