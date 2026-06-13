@@ -1,0 +1,419 @@
+/* ============================================================
+   MAC OS 9 mode — menu bar, desktop, windows, dialogs, status
+   ============================================================ */
+#menubar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--menubar-h);
+  background: linear-gradient(180deg, var(--plat-light), var(--plat));
+  border-bottom: 2px solid var(--mac-black);
+  display: flex;
+  align-items: stretch;
+  z-index: 20000;
+  font-family: var(--mac-font);
+  font-size: 14px;
+  color: var(--mac-black);
+  user-select: none;
+  box-shadow: 0 2px 0 rgba(57,255,110,0.25);
+}
+.menu-item {
+  padding: 0 13px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+.menu-item:hover, .menu-item.open {
+  background: var(--mac-black);
+  color: var(--green);
+}
+.menu-logo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mac-black);
+  animation: logoGlitch 8s step-end infinite;
+}
+@keyframes logoGlitch {
+  0%, 93% { transform: none; }
+  94% { transform: translateX(-2px); color: var(--red); }
+  95% { transform: translateX(2px); color: var(--blue); }
+  96%, 100% { transform: none; }
+}
+.menu-item.open .menu-logo { color: var(--green); }
+
+.menu-spacer { flex: 1; }
+
+#menu-clock {
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 210px;
+  background: var(--plat-light);
+  border: 1px solid var(--mac-black);
+  border-top: none;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.55);
+  padding: 3px 0;
+  z-index: 20001;
+}
+.menu-item.open .dropdown { display: block; }
+.dd-item {
+  padding: 5px 18px 5px 16px;
+  color: var(--mac-black);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+.dd-item:hover { background: var(--mac-black); color: var(--green); }
+.dd-item.disabled { color: var(--plat-dark); pointer-events: none; }
+.dd-sep { border-top: 1px solid var(--plat-dark); margin: 3px 1px; }
+.dd-key { color: inherit; opacity: 0.55; font-size: 12px; }
+
+/* ============================================================
+   DESKTOP + ICONS
+   ============================================================ */
+#desktop {
+  position: fixed;
+  inset: var(--menubar-h) 0 26px 0;
+  z-index: 5;
+}
+
+.desk-icon {
+  position: absolute;
+  width: 84px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+}
+.desk-icon .glyph {
+  font-size: 34px;
+  line-height: 1.1;
+  filter: drop-shadow(0 0 6px rgba(57,255,110,0.5));
+  transition: transform 0.1s;
+}
+.desk-icon .label {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--mac-font);
+  font-size: 12px;
+  color: #fff;
+  background: rgba(3,10,5,0.85);
+  padding: 1px 6px;
+  border: 1px solid transparent;
+  text-shadow: 0 1px 0 #000;
+}
+.desk-icon:hover .glyph { transform: scale(1.12); }
+.desk-icon.selected .label {
+  background: var(--green);
+  color: var(--bg);
+}
+.desk-icon:active .glyph { animation: iconJolt 0.25s step-end; }
+@keyframes iconJolt {
+  0% { transform: translateX(-3px) scale(1.1); filter: hue-rotate(140deg); }
+  50% { transform: translateX(3px) scale(1.1); }
+  100% { transform: none; }
+}
+/* sketchy download icon gets a warning tint */
+.desk-icon.danger .glyph { filter: drop-shadow(0 0 6px rgba(255,34,68,0.7)); color: var(--red); }
+
+/* ============================================================
+   WINDOWS (classic Mac platinum)
+   ============================================================ */
+.mac-window {
+  position: absolute;
+  background: var(--plat);
+  border: 1px solid var(--mac-black);
+  box-shadow:
+    inset 1px 1px 0 var(--plat-light),
+    inset -1px -1px 0 var(--plat-dark),
+    4px 4px 0 rgba(0,0,0,0.55),
+    0 0 24px rgba(57,255,110,0.12);
+  min-width: 240px;
+  display: none;
+  flex-direction: column;
+  z-index: 100;
+  cursor: default;
+}
+.mac-window.open { display: flex; }
+.mac-window.shaded .win-body, .mac-window.shaded .win-status { display: none; }
+
+.titlebar {
+  height: var(--titlebar-h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 7px;
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0 3px,
+      var(--plat-dark) 3px 4px) ,
+    linear-gradient(180deg, var(--plat-light), var(--plat));
+  background-blend-mode: normal;
+  border-bottom: 1px solid var(--mac-black);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.titlebar:active { cursor: grabbing; }
+.mac-window.inactive .titlebar { background: var(--plat); }
+.mac-window.inactive .titlebar .stripes { visibility: hidden; }
+
+.titlebar .t-btn {
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--mac-black);
+  background: linear-gradient(135deg, var(--plat-light), var(--plat-dark));
+  cursor: pointer;
+  flex: 0 0 auto;
+  position: relative;
+}
+.titlebar .t-btn:hover { background: var(--green); }
+.titlebar .t-btn:active { background: var(--mac-black); }
+
+.titlebar .title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--mac-font);
+  font-size: 14px;
+  color: var(--mac-black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: inherit;
+  padding: 0 8px;
+}
+
+.win-body {
+  padding: 16px 18px;
+  background: var(--plat-light);
+  color: var(--mac-black);
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-y: auto;
+  max-height: calc(100dvh - 160px);
+  border-top: 1px solid var(--plat-light);
+}
+.win-body::-webkit-scrollbar { width: 14px; }
+.win-body::-webkit-scrollbar-track { background: var(--plat); border-left: 1px solid var(--plat-dark); }
+.win-body::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--plat-light), var(--plat-dark)); border: 1px solid var(--mac-black); }
+
+.win-status {
+  border-top: 1px solid var(--plat-dark);
+  background: var(--plat);
+  font-family: var(--mac-font);
+  font-size: 11px;
+  color: var(--plat-darker);
+  padding: 3px 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* window content typography */
+.win-body h2 {
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--mac-black);
+  margin-bottom: 10px;
+}
+.win-body p { margin-bottom: 12px; }
+.win-body .hl { background: var(--green); color: var(--bg); padding: 0 4px; }
+.win-body .hl-red { color: var(--red); font-weight: bold; }
+.win-body a { color: #0033cc; }
+
+/* ====== SERVICES list (Finder-style) ====== */
+.finder-head, .finder-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 110px;
+  gap: 8px;
+  align-items: center;
+}
+.finder-head {
+  font-family: var(--mac-font);
+  font-size: 11px;
+  color: var(--plat-darker);
+  border-bottom: 1px solid var(--plat-dark);
+  padding: 2px 6px 4px;
+  margin-bottom: 2px;
+}
+.finder-row {
+  padding: 7px 6px;
+  cursor: pointer;
+  border: 1px dotted transparent;
+}
+.finder-row:hover { background: #cfcfcf; }
+.finder-row.expanded { background: var(--mac-black); color: var(--green); }
+.finder-row .f-icon { font-size: 20px; text-align: center; }
+.finder-row .f-name { font-family: var(--mac-font); font-size: 14px; }
+.finder-row .f-kind { font-size: 11px; color: var(--plat-darker); text-align: right; }
+.finder-row.expanded .f-kind { color: var(--green-dim); }
+.finder-desc {
+  display: none;
+  padding: 10px 14px 14px 50px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  background: #efefef;
+  border-bottom: 1px solid var(--plat-dark);
+}
+.finder-desc.show { display: block; animation: descIn 0.18s steps(3); }
+@keyframes descIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+.finder-desc .ask-btn {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--mac-font);
+  font-size: 12px;
+  border: 1px solid var(--mac-black);
+  background: var(--plat);
+  padding: 3px 12px;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 var(--mac-black);
+}
+.finder-desc .ask-btn:hover { background: var(--green); }
+.finder-desc .ask-btn:active { box-shadow: none; transform: translate(1px,1px); }
+
+/* ====== CONTACT form ====== */
+.field-group { margin-bottom: 12px; }
+.field-label {
+  display: block;
+  font-family: var(--mac-font);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--plat-darker);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.field-input, .field-textarea, .field-select {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--mac-black);
+  box-shadow: inset 1px 1px 0 var(--plat-dark);
+  color: var(--mac-black);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 6px 8px;
+  outline: none;
+  border-radius: 0;
+  caret-color: var(--mac-black);
+}
+.field-input:focus, .field-textarea:focus, .field-select:focus {
+  box-shadow: inset 1px 1px 0 var(--plat-dark), 0 0 0 2px var(--green);
+}
+.field-textarea { resize: vertical; min-height: 80px; display: block; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.send-btn {
+  font-family: var(--mac-font);
+  font-size: 14px;
+  letter-spacing: 1px;
+  background: var(--plat);
+  border: 2px solid var(--mac-black);
+  border-radius: 8px;
+  color: var(--mac-black);
+  padding: 7px 26px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--mac-black);
+  margin-top: 6px;
+}
+.send-btn:hover { background: var(--green); }
+.send-btn:active { box-shadow: none; transform: translate(2px,2px); }
+
+#confirm {
+  display: none;
+  margin-top: 12px;
+  border: 1px solid var(--mac-black);
+  background: #ffffff;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--green-dim);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Contact = stable island: gentle jerk only, never clips/hides content */
+@keyframes formJerk {
+  0%   { transform: translate(0,0); }
+  30%  { transform: translate(-5px, 2px); }
+  55%  { transform: translate(4px, -3px); }
+  80%  { transform: translate(-2px, 1px); }
+  100% { transform: translate(0,0); }
+}
+.form-jerk { animation: formJerk 0.28s steps(4) 1; }
+
+/* ====== ERROR / BOMB dialog ====== */
+.dialog {
+  position: absolute;
+  background: var(--plat-light);
+  border: 2px solid var(--mac-black);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+  padding: 18px 20px 16px;
+  min-width: 280px;
+  max-width: min(420px, 90vw);
+  z-index: 30000;
+  display: none;
+  color: var(--mac-black);
+  cursor: default;
+}
+.dialog.open { display: block; animation: dlgIn 0.15s steps(2); }
+@keyframes dlgIn { from { transform: scale(0.7); } to { transform: scale(1); } }
+.dialog .d-row { display: flex; gap: 16px; align-items: flex-start; }
+.dialog .d-icon { font-size: 34px; line-height: 1; }
+.dialog .d-text { font-size: 13px; line-height: 1.6; }
+.dialog .d-text b { font-family: var(--mac-font); }
+.dialog .d-btns { text-align: right; margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end; }
+.dialog .d-btn {
+  font-family: var(--mac-font);
+  font-size: 13px;
+  background: var(--plat);
+  border: 1px solid var(--mac-black);
+  border-radius: 6px;
+  padding: 4px 18px;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 var(--mac-black);
+}
+.dialog .d-btn.primary { border-width: 2px; box-shadow: 2px 2px 0 var(--mac-black); background: var(--green); }
+.dialog .d-btn:active { box-shadow: none; transform: translate(1px,1px); }
+
+/* ============================================================
+   STATUS LINE
+   ============================================================ */
+.status-line {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--green-faint);
+  border-top: 1px solid var(--green-dim);
+  padding: 4px 14px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 19000;
+}
+.status-line span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-blink { animation: blink 1s step-end infinite; color: var(--green); }
+
+/* ============================================================
+   GLITCH SLICE on windows
+   ============================================================ */
+@keyframes winGlitch {
+  0% { clip-path: none; transform: var(--base-t, none); }
+  25% { clip-path: polygon(0 30%, 100% 30%, 100% 36%, 0 36%); transform: translateX(-6px); }
+  50% { clip-path: polygon(0 60%, 100% 60%, 100% 63%, 0 63%); transform: translateX(5px); }
+  75% { clip-path: polygon(0 12%, 100% 12%, 100% 15%, 0 15%); transform: translateX(-3px); }
+  100% { clip-path: none; transform: none; }
+}
+.mac-window.glitching { animation: winGlitch 0.22s step-end 1; }

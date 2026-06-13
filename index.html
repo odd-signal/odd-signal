@@ -5,938 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ODD SIGNAL // OS 9.1 // ERR_CARRIER_FOUND</title>
 <meta name="description" content="Odd Signal — technology consulting for artists & independents. Private AI agents, tech audits, art & hardware integration.">
+<!-- critical: paint black immediately, never a white flash before CSS lands -->
+<style>html,body{background:#030a05;margin:0}</style>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Pixelify+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-:root {
-  --green: #39ff6e;
-  --green-dim: #1a7a38;
-  --green-faint: #0d2e18;
-  --red: #ff2244;
-  --amber: #ffaa00;
-  --blue: #00aaff;
-  --bg: #030a05;
-  --scanline: rgba(0,0,0,0.18);
-  --text: #b8ffcc;
-  --text-dim: #4a8a5a;
-
-  /* Classic Mac platinum palette */
-  --plat: #dddddd;
-  --plat-light: #f4f4f4;
-  --plat-dark: #999999;
-  --plat-darker: #555555;
-  --mac-black: #111111;
-  --titlebar-h: 24px;
-  --menubar-h: 26px;
-
-  --mac-font: 'Pixelify Sans', 'Share Tech Mono', monospace;
-  --mono: 'Share Tech Mono', monospace;
-}
-
-html { height: 100%; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 14px;
-  line-height: 1.6;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-  cursor: crosshair;
-}
-
-/* CRT scanlines overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    var(--scanline) 2px,
-    var(--scanline) 4px
-  );
-  pointer-events: none;
-  z-index: 99999;
-}
-
-/* Vignette */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%);
-  pointer-events: none;
-  z-index: 99998;
-}
-
-::selection { background: var(--green); color: var(--bg); }
-
-/* ============================================================
-   BOOT SCREEN
-   ============================================================ */
-#boot {
-  position: fixed;
-  inset: 0;
-  background: #0a0a0a;
-  z-index: 50000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 28px;
-  cursor: pointer;
-  transition: opacity 0.5s;
-}
-#boot.done { opacity: 0; pointer-events: none; }
-
-.boot-mac {
-  width: 120px;
-  height: 150px;
-  border: 3px solid var(--green);
-  border-radius: 10px;
-  position: relative;
-  box-shadow: 0 0 30px rgba(57,255,110,0.4), inset 0 0 14px rgba(57,255,110,0.15);
-  animation: bootMacGlitch 4s step-end infinite;
-}
-.boot-mac .screen {
-  position: absolute;
-  inset: 12px 12px 40px 12px;
-  border: 2px solid var(--green);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'VT323', monospace;
-  font-size: 44px;
-  color: var(--green);
-  text-shadow: 0 0 12px rgba(57,255,110,0.8);
-  overflow: hidden;
-}
-.boot-mac .slot {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 4px;
-  background: var(--green-dim);
-}
-@keyframes bootMacGlitch {
-  0%, 90% { transform: none; filter: none; }
-  91% { transform: translateX(-4px) skewX(-3deg); filter: hue-rotate(120deg); }
-  92% { transform: translateX(3px); filter: none; }
-  93%, 100% { transform: none; }
-}
-
-.boot-title {
-  font-family: 'VT323', monospace;
-  font-size: 34px;
-  letter-spacing: 6px;
-  color: #fff;
-  text-shadow: 0 0 14px rgba(57,255,110,0.8);
-}
-.boot-title .v { color: var(--green-dim); font-size: 18px; letter-spacing: 3px; }
-
-.boot-bar {
-  width: min(360px, 76vw);
-  height: 16px;
-  border: 2px solid var(--green);
-  padding: 2px;
-  box-shadow: 0 0 14px rgba(57,255,110,0.3);
-}
-.boot-bar .fill {
-  height: 100%;
-  width: 0%;
-  background: repeating-linear-gradient(90deg, var(--green) 0 8px, var(--green-dim) 8px 10px);
-  transition: width 0.18s steps(4);
-}
-
-.boot-log {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-  height: 92px;
-  width: min(360px, 76vw);
-  overflow: hidden;
-  text-align: left;
-}
-.boot-log .ok { color: var(--green); }
-.boot-log .err { color: var(--red); }
-
-.boot-skip {
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--text-dim);
-  animation: blink 1.2s step-end infinite;
-}
-
-/* ============================================================
-   BACKGROUND NOISE + GLITCH CANVAS
-   ============================================================ */
-.bg-noise {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-.bg-noise span {
-  position: absolute;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--green-dim);
-  opacity: 0.32;
-  user-select: none;
-  animation: bgFlicker 4.5s step-end infinite;
-}
-@keyframes bgFlicker {
-  0%, 90% { opacity: 0.3; color: var(--green-dim); }
-  91%, 93% { opacity: 0.16; }
-  94% { opacity: 0.42; color: var(--amber); }
-  95%, 100% { opacity: 0.3; color: var(--green-dim); }
-}
-
-#glitch-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.85;
-}
-
-/* VHS tracking sweep — smooth band drifting down screen */
-#tracking {
-  position: fixed;
-  left: 0; right: 0; top: 0;
-  height: 72px;
-  transform: translateY(-90px);
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
-  background: linear-gradient(180deg,
-    transparent,
-    rgba(0,170,255,0.06) 44%,
-    rgba(255,255,255,0.07) 50%,
-    rgba(255,34,68,0.06) 56%,
-    transparent);
-  box-shadow: 0 0 18px rgba(57,255,110,0.05);
-}
-#tracking.run { animation: trackSweep 1.7s linear 1; }
-@keyframes trackSweep {
-  0%   { transform: translateY(-90px); opacity: 0; }
-  8%   { opacity: 0.65; }
-  50%  { opacity: 0.5; }
-  92%  { opacity: 0.65; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-
-/* RGB chromatic split — brief, on headings */
-@keyframes rgbSplit {
-  0%   { text-shadow: none; transform: none; }
-  25%  { text-shadow: -2px 0 var(--red), 2px 0 var(--blue); transform: translateX(1px); }
-  50%  { text-shadow: 2px 0 var(--blue), -2px 0 var(--red); transform: translateX(-1px); }
-  75%  { text-shadow: -1px 0 var(--red), 1px 0 var(--blue); transform: translateX(1px); }
-  100% { text-shadow: none; transform: none; }
-}
-.rgb-hit { animation: rgbSplit 0.42s steps(4) 1; }
-
-/* ============================================================
-   MENU BAR (classic Mac)
-   ============================================================ */
-#menubar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: var(--menubar-h);
-  background: linear-gradient(180deg, var(--plat-light), var(--plat));
-  border-bottom: 2px solid var(--mac-black);
-  display: flex;
-  align-items: stretch;
-  z-index: 20000;
-  font-family: var(--mac-font);
-  font-size: 14px;
-  color: var(--mac-black);
-  user-select: none;
-  box-shadow: 0 2px 0 rgba(57,255,110,0.25);
-}
-.menu-item {
-  padding: 0 13px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  white-space: nowrap;
-}
-.menu-item:hover, .menu-item.open {
-  background: var(--mac-black);
-  color: var(--green);
-}
-.menu-logo {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--mac-black);
-  animation: logoGlitch 8s step-end infinite;
-}
-@keyframes logoGlitch {
-  0%, 93% { transform: none; }
-  94% { transform: translateX(-2px); color: var(--red); }
-  95% { transform: translateX(2px); color: var(--blue); }
-  96%, 100% { transform: none; }
-}
-.menu-item.open .menu-logo { color: var(--green); }
-
-.menu-spacer { flex: 1; }
-
-#menu-clock {
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  letter-spacing: 1px;
-}
-
-.dropdown {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 210px;
-  background: var(--plat-light);
-  border: 1px solid var(--mac-black);
-  border-top: none;
-  box-shadow: 3px 3px 0 rgba(0,0,0,0.55);
-  padding: 3px 0;
-  z-index: 20001;
-}
-.menu-item.open .dropdown { display: block; }
-.dd-item {
-  padding: 5px 18px 5px 16px;
-  color: var(--mac-black);
-  font-size: 14px;
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-}
-.dd-item:hover { background: var(--mac-black); color: var(--green); }
-.dd-item.disabled { color: var(--plat-dark); pointer-events: none; }
-.dd-sep { border-top: 1px solid var(--plat-dark); margin: 3px 1px; }
-.dd-key { color: inherit; opacity: 0.55; font-size: 12px; }
-
-/* ============================================================
-   DESKTOP + ICONS
-   ============================================================ */
-#desktop {
-  position: fixed;
-  inset: var(--menubar-h) 0 26px 0;
-  z-index: 5;
-}
-
-.desk-icon {
-  position: absolute;
-  width: 84px;
-  text-align: center;
-  cursor: pointer;
-  z-index: 10;
-  user-select: none;
-}
-.desk-icon .glyph {
-  font-size: 34px;
-  line-height: 1.1;
-  filter: drop-shadow(0 0 6px rgba(57,255,110,0.5));
-  transition: transform 0.1s;
-}
-.desk-icon .label {
-  display: inline-block;
-  margin-top: 4px;
-  font-family: var(--mac-font);
-  font-size: 12px;
-  color: #fff;
-  background: rgba(3,10,5,0.85);
-  padding: 1px 6px;
-  border: 1px solid transparent;
-  text-shadow: 0 1px 0 #000;
-}
-.desk-icon:hover .glyph { transform: scale(1.12); }
-.desk-icon.selected .label {
-  background: var(--green);
-  color: var(--bg);
-}
-.desk-icon:active .glyph { animation: iconJolt 0.25s step-end; }
-@keyframes iconJolt {
-  0% { transform: translateX(-3px) scale(1.1); filter: hue-rotate(140deg); }
-  50% { transform: translateX(3px) scale(1.1); }
-  100% { transform: none; }
-}
-
-/* ============================================================
-   WINDOWS (classic Mac platinum)
-   ============================================================ */
-.mac-window {
-  position: absolute;
-  background: var(--plat);
-  border: 1px solid var(--mac-black);
-  box-shadow:
-    inset 1px 1px 0 var(--plat-light),
-    inset -1px -1px 0 var(--plat-dark),
-    4px 4px 0 rgba(0,0,0,0.55),
-    0 0 24px rgba(57,255,110,0.12);
-  min-width: 240px;
-  display: none;
-  flex-direction: column;
-  z-index: 100;
-  cursor: default;
-}
-.mac-window.open { display: flex; }
-.mac-window.shaded .win-body, .mac-window.shaded .win-status { display: none; }
-
-.titlebar {
-  height: var(--titlebar-h);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 7px;
-  background:
-    repeating-linear-gradient(180deg,
-      transparent 0 3px,
-      var(--plat-dark) 3px 4px) ,
-    linear-gradient(180deg, var(--plat-light), var(--plat));
-  background-blend-mode: normal;
-  border-bottom: 1px solid var(--mac-black);
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
-}
-.titlebar:active { cursor: grabbing; }
-.mac-window.inactive .titlebar { background: var(--plat); }
-.mac-window.inactive .titlebar .stripes { visibility: hidden; }
-
-.titlebar .t-btn {
-  width: 13px;
-  height: 13px;
-  border: 1px solid var(--mac-black);
-  background: linear-gradient(135deg, var(--plat-light), var(--plat-dark));
-  cursor: pointer;
-  flex: 0 0 auto;
-  position: relative;
-}
-.titlebar .t-btn:hover { background: var(--green); }
-.titlebar .t-btn:active { background: var(--mac-black); }
-
-.titlebar .title {
-  flex: 1;
-  text-align: center;
-  font-family: var(--mac-font);
-  font-size: 14px;
-  color: var(--mac-black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: inherit;
-  padding: 0 8px;
-}
-
-.win-body {
-  padding: 16px 18px;
-  background: var(--plat-light);
-  color: var(--mac-black);
-  font-size: 13px;
-  line-height: 1.7;
-  overflow-y: auto;
-  max-height: calc(100dvh - 160px);
-  border-top: 1px solid var(--plat-light);
-}
-.win-body::-webkit-scrollbar { width: 14px; }
-.win-body::-webkit-scrollbar-track { background: var(--plat); border-left: 1px solid var(--plat-dark); }
-.win-body::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--plat-light), var(--plat-dark)); border: 1px solid var(--mac-black); }
-
-.win-status {
-  border-top: 1px solid var(--plat-dark);
-  background: var(--plat);
-  font-family: var(--mac-font);
-  font-size: 11px;
-  color: var(--plat-darker);
-  padding: 3px 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-/* window content typography */
-.win-body h2 {
-  font-family: 'VT323', monospace;
-  font-size: 28px;
-  letter-spacing: 1px;
-  color: var(--mac-black);
-  margin-bottom: 10px;
-}
-.win-body p { margin-bottom: 12px; }
-.win-body .hl { background: var(--green); color: var(--bg); padding: 0 4px; }
-.win-body .hl-red { color: var(--red); font-weight: bold; }
-.win-body a { color: #0033cc; }
-
-/* ====== SERVICES list (Finder-style) ====== */
-.finder-head, .finder-row {
-  display: grid;
-  grid-template-columns: 36px 1fr 110px;
-  gap: 8px;
-  align-items: center;
-}
-.finder-head {
-  font-family: var(--mac-font);
-  font-size: 11px;
-  color: var(--plat-darker);
-  border-bottom: 1px solid var(--plat-dark);
-  padding: 2px 6px 4px;
-  margin-bottom: 2px;
-}
-.finder-row {
-  padding: 7px 6px;
-  cursor: pointer;
-  border: 1px dotted transparent;
-}
-.finder-row:hover { background: #cfcfcf; }
-.finder-row.expanded { background: var(--mac-black); color: var(--green); }
-.finder-row .f-icon { font-size: 20px; text-align: center; }
-.finder-row .f-name { font-family: var(--mac-font); font-size: 14px; }
-.finder-row .f-kind { font-size: 11px; color: var(--plat-darker); text-align: right; }
-.finder-row.expanded .f-kind { color: var(--green-dim); }
-.finder-desc {
-  display: none;
-  padding: 10px 14px 14px 50px;
-  font-size: 12.5px;
-  line-height: 1.7;
-  background: #efefef;
-  border-bottom: 1px solid var(--plat-dark);
-}
-.finder-desc.show { display: block; animation: descIn 0.18s steps(3); }
-@keyframes descIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
-.finder-desc .ask-btn {
-  display: inline-block;
-  margin-top: 8px;
-  font-family: var(--mac-font);
-  font-size: 12px;
-  border: 1px solid var(--mac-black);
-  background: var(--plat);
-  padding: 3px 12px;
-  cursor: pointer;
-  box-shadow: 1px 1px 0 var(--mac-black);
-}
-.finder-desc .ask-btn:hover { background: var(--green); }
-.finder-desc .ask-btn:active { box-shadow: none; transform: translate(1px,1px); }
-
-/* ====== CONTACT form ====== */
-.field-group { margin-bottom: 12px; }
-.field-label {
-  display: block;
-  font-family: var(--mac-font);
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: var(--plat-darker);
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
-.field-input, .field-textarea, .field-select {
-  width: 100%;
-  background: #ffffff;
-  border: 1px solid var(--mac-black);
-  box-shadow: inset 1px 1px 0 var(--plat-dark);
-  color: var(--mac-black);
-  font-family: var(--mono);
-  font-size: 14px;
-  padding: 6px 8px;
-  outline: none;
-  border-radius: 0;
-  caret-color: var(--mac-black);
-}
-.field-input:focus, .field-textarea:focus, .field-select:focus {
-  box-shadow: inset 1px 1px 0 var(--plat-dark), 0 0 0 2px var(--green);
-}
-.field-textarea { resize: vertical; min-height: 80px; display: block; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-.send-btn {
-  font-family: var(--mac-font);
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: var(--plat);
-  border: 2px solid var(--mac-black);
-  border-radius: 8px;
-  color: var(--mac-black);
-  padding: 7px 26px;
-  cursor: pointer;
-  box-shadow: 2px 2px 0 var(--mac-black);
-  margin-top: 6px;
-}
-.send-btn:hover { background: var(--green); }
-.send-btn:active { box-shadow: none; transform: translate(2px,2px); }
-
-#confirm {
-  display: none;
-  margin-top: 12px;
-  border: 1px solid var(--mac-black);
-  background: #ffffff;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--green-dim);
-  animation: fadeIn 0.3s ease;
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ====== ERROR / BOMB dialog ====== */
-.dialog {
-  position: absolute;
-  background: var(--plat-light);
-  border: 2px solid var(--mac-black);
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
-  padding: 18px 20px 16px;
-  min-width: 280px;
-  max-width: min(420px, 90vw);
-  z-index: 30000;
-  display: none;
-  color: var(--mac-black);
-  cursor: default;
-}
-.dialog.open { display: block; animation: dlgIn 0.15s steps(2); }
-@keyframes dlgIn { from { transform: scale(0.7); } to { transform: scale(1); } }
-.dialog .d-row { display: flex; gap: 16px; align-items: flex-start; }
-.dialog .d-icon { font-size: 34px; line-height: 1; }
-.dialog .d-text { font-size: 13px; line-height: 1.6; }
-.dialog .d-text b { font-family: var(--mac-font); }
-.dialog .d-btns { text-align: right; margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end; }
-.dialog .d-btn {
-  font-family: var(--mac-font);
-  font-size: 13px;
-  background: var(--plat);
-  border: 1px solid var(--mac-black);
-  border-radius: 6px;
-  padding: 4px 18px;
-  cursor: pointer;
-  box-shadow: 1px 1px 0 var(--mac-black);
-}
-.dialog .d-btn.primary { border-width: 2px; box-shadow: 2px 2px 0 var(--mac-black); background: var(--green); }
-.dialog .d-btn:active { box-shadow: none; transform: translate(1px,1px); }
-
-/* ============================================================
-   STATUS LINE
-   ============================================================ */
-.status-line {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--green-faint);
-  border-top: 1px solid var(--green-dim);
-  padding: 4px 14px;
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--text-dim);
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  z-index: 19000;
-}
-.status-line span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.status-blink { animation: blink 1s step-end infinite; color: var(--green); }
-@keyframes blink { 50% { opacity: 0; } }
-
-/* ============================================================
-   GLITCH SLICE on windows
-   ============================================================ */
-@keyframes winGlitch {
-  0% { clip-path: none; transform: var(--base-t, none); }
-  25% { clip-path: polygon(0 30%, 100% 30%, 100% 36%, 0 36%); transform: translateX(-6px); }
-  50% { clip-path: polygon(0 60%, 100% 60%, 100% 63%, 0 63%); transform: translateX(5px); }
-  75% { clip-path: polygon(0 12%, 100% 12%, 100% 15%, 0 15%); transform: translateX(-3px); }
-  100% { clip-path: none; transform: none; }
-}
-.mac-window.glitching { animation: winGlitch 0.22s step-end 1; }
-
-/* ============================================================
-   iOS MODE — iPhone OS 1–3 (auto on narrow screens)
-   ============================================================ */
-#ios-root { display: none; }
-body.mode-ios #ios-root { display: block; }
-body.mode-ios #menubar,
-body.mode-ios #desktop,
-body.mode-ios .status-line { display: none; }
-body.mode-ios { cursor: default; }
-
-/* --- status bar --- */
-#ios-statusbar {
-  position: fixed; top: 0; left: 0; right: 0; height: 24px;
-  background: linear-gradient(180deg, #6f6f6f, #222 48%, #000 52%);
-  color: #fff; font-size: 12px; font-weight: bold;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  display: flex; align-items: center; gap: 7px; padding: 0 9px;
-  z-index: 21000; text-shadow: 0 -1px 0 #000;
-  border-bottom: 1px solid rgba(57,255,110,0.35);
-}
-#ios-bars { display: flex; align-items: flex-end; gap: 1.5px; height: 11px; }
-#ios-bars i { width: 3px; background: #fff; border-radius: 1px 1px 0 0; display: block; }
-#ios-time { flex: 1; text-align: center; }
-#ios-batt { display: flex; align-items: center; gap: 4px; font-weight: normal; font-size: 11px; }
-.batt-shell { width: 23px; height: 11px; border: 1px solid #fff; border-radius: 2px; padding: 1.5px; position: relative; }
-.batt-shell::after { content: ''; position: absolute; right: -3.5px; top: 3px; width: 2.5px; height: 5px; background: #fff; border-radius: 0 1px 1px 0; }
-#batt-fill { height: 100%; width: 64%; background: linear-gradient(180deg, #b8ef62, #4e9613 55%, #387a08); }
-
-/* --- lock screen --- */
-#lockscreen {
-  position: fixed; inset: 0; z-index: 20500;
-  display: flex; flex-direction: column;
-  background: linear-gradient(180deg, rgba(3,10,5,0.55), rgba(0,0,0,0.8));
-  transition: transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.5s;
-}
-#lockscreen.unlocked { transform: translateY(-101%); opacity: 0; pointer-events: none; }
-.lock-clockbox {
-  margin-top: 56px; text-align: center; color: #fff;
-  background: linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.28));
-  border-top: 1px solid rgba(255,255,255,0.16);
-  border-bottom: 1px solid rgba(0,0,0,0.6);
-  padding: 16px 0 13px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-#lock-time { font-size: 62px; font-weight: 300; line-height: 1; letter-spacing: -2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-#lock-date { font-size: 15px; margin-top: 7px; opacity: 0.92; }
-.lock-flex { flex: 1; display: flex; align-items: center; justify-content: center; }
-.lock-sig {
-  font-family: 'VT323', monospace; color: var(--green);
-  font-size: 24px; letter-spacing: 5px; text-align: center; line-height: 1.7;
-  text-shadow: 0 0 16px rgba(57,255,110,0.7);
-}
-.lock-sig small { font-size: 13px; letter-spacing: 3px; color: var(--text-dim); display: block; }
-
-.unlock-tray {
-  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.8));
-  border-top: 1px solid rgba(255,255,255,0.14);
-  padding: 17px 0 max(28px, env(safe-area-inset-bottom));
-  display: flex; justify-content: center;
-}
-#slider-track {
-  position: relative; width: min(300px, 82vw); height: 52px; border-radius: 14px;
-  background: #0d0d0d;
-  box-shadow: inset 0 2px 9px #000, inset 0 -1px 0 rgba(255,255,255,0.14);
-}
-#slider-thumb {
-  position: absolute; top: 4px; left: 4px; width: 78px; height: 44px; border-radius: 10px;
-  background: linear-gradient(180deg, #fdfdfd, #c3c7cc 48%, #9aa0a8 52%, #d9dcdf);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; color: #5a5a5a;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
-}
-#slider-thumb:active { cursor: grabbing; }
-#slider-label {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  padding-left: 52px; font-size: 19px; pointer-events: none;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background: linear-gradient(90deg, rgba(255,255,255,0.4) 40%, #fff 50%, rgba(255,255,255,0.4) 60%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: shimmer 2.6s linear infinite;
-}
-@keyframes shimmer { 0% { background-position: 180% 0; } 100% { background-position: -80% 0; } }
-
-/* --- springboard --- */
-#springboard { position: fixed; inset: 24px 0 0 0; display: flex; flex-direction: column; z-index: 5; }
-#lockscreen:not(.unlocked) ~ #springboard { visibility: hidden; }
-.sb-grid {
-  flex: 1; display: grid; grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 98px; gap: 6px 0; padding: 16px 8px 0; align-content: start;
-}
-.sb-icon {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  cursor: pointer; user-select: none; -webkit-user-select: none;
-}
-.sb-icon .tile {
-  width: 57px; height: 57px; border-radius: 13px; position: relative;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 30px; color: #fff;
-  border: 1px solid rgba(0,0,0,0.6);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.65), inset 0 1px 1px rgba(255,255,255,0.45);
-  overflow: hidden;
-}
-.sb-icon .tile::before {
-  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.1));
-  border-radius: 12px 12px 45% 45% / 12px 12px 16px 16px;
-}
-.sb-icon .name { font-size: 11.5px; color: #fff; text-shadow: 0 1px 2px #000; font-weight: 500; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-.sb-icon:active .tile { filter: brightness(0.55); }
-.tile-green { background: linear-gradient(180deg, #3fcf63, #0d6e29); }
-.tile-grey  { background: linear-gradient(180deg, #8d99a6, #39434f); }
-.tile-amber { background: linear-gradient(180deg, #ffc44d, #b36a00); }
-.tile-dark  { background: linear-gradient(180deg, #3a3f44, #0b0d0f); color: var(--green); }
-.tile-blue  { background: linear-gradient(180deg, #6db3e8, #16548f); }
-
-.sb-dock {
-  margin: 0 5px max(8px, env(safe-area-inset-bottom));
-  padding: 9px 6px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.07) 40%, rgba(0,0,0,0.3));
-  border: 1px solid rgba(255,255,255,0.2);
-  display: grid; grid-template-columns: repeat(4, 1fr);
-}
-.sb-dock .sb-icon .name { display: none; }
-
-/* --- apps --- */
-.ios-app {
-  position: fixed; inset: 24px 0 0 0; z-index: 18000;
-  background: #c5ccd3;
-  display: none; flex-direction: column;
-  transform: scale(0.15); opacity: 0;
-  transition: transform 0.28s ease, opacity 0.28s ease;
-  transform-origin: center 65%;
-}
-.ios-app.open { display: flex; }
-.ios-app.in { transform: scale(1); opacity: 1; }
-
-.ios-navbar {
-  height: 44px; flex: 0 0 auto;
-  background: linear-gradient(180deg, #b2becf, #8b9db5 48%, #6d84a2 52%, #8195af);
-  border-bottom: 1px solid #2d3642;
-  display: flex; align-items: center; justify-content: center; position: relative;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: bold; font-size: 19px; color: #fff;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
-}
-.ios-back {
-  position: absolute; left: 7px; top: 7px; height: 30px;
-  padding: 0 11px 0 17px; display: flex; align-items: center;
-  background: linear-gradient(180deg, #8a9cb5, #5c7396 48%, #42597c 52%, #5a7194);
-  clip-path: polygon(13px 0, 100% 0, 100% 100%, 13px 100%, 0 50%);
-  border: 0; border-radius: 0 5px 5px 0;
-  font-size: 13px; font-weight: bold; color: #fff;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
-  cursor: pointer;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-.app-body {
-  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding: 16px 14px 24px;
-  color: #111; font-size: 15px; line-height: 1.65;
-  background: repeating-linear-gradient(90deg, #c5ccd3 0 6px, #cfd5db 6px 7px);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-.app-body h2 { font-family: 'VT323', monospace; font-size: 32px; margin-bottom: 10px; color: #111; }
-.app-body p { margin-bottom: 12px; }
-.app-body .hl { background: var(--green); color: var(--bg); padding: 0 4px; }
-
-.home-bar {
-  flex: 0 0 auto; background: #000;
-  padding: 7px 0 max(9px, env(safe-area-inset-bottom));
-  display: flex; justify-content: center;
-}
-.home-btn {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: radial-gradient(circle at 50% 32%, #3d3d3d, #000 72%);
-  border: 2px solid #1f1f1f;
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.16);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-.home-btn::before { content: ''; width: 16px; height: 16px; border: 2px solid #6f6f6f; border-radius: 4px; }
-.home-btn:active { background: radial-gradient(circle at 50% 32%, #222, #000 72%); }
-
-/* --- iOS services table --- */
-.ios-table { background: #fff; border: 1px solid #999; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
-.ios-cell {
-  padding: 13px 14px; border-bottom: 1px solid #ddd;
-  display: flex; align-items: center; gap: 12px; cursor: pointer;
-  font-size: 16px; font-weight: 500;
-}
-.ios-cell:last-child { border-bottom: 0; }
-.ios-cell:active { background: linear-gradient(180deg, #4a90d9, #1a62b8); color: #fff; }
-.ios-cell .c-icon { font-size: 21px; width: 26px; text-align: center; }
-.ios-cell .chevron { margin-left: auto; color: #aaa; font-weight: bold; }
-.ios-cell-desc {
-  display: none; padding: 12px 16px; background: #f3f5f7;
-  border-bottom: 1px solid #ddd; font-size: 14px; line-height: 1.6;
-}
-.ios-cell-desc.show { display: block; animation: descIn 0.18s steps(3); }
-.ios-cell-desc .ask-btn {
-  display: inline-block; margin-top: 9px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 14px; font-weight: bold; color: #fff;
-  background: linear-gradient(180deg, #5dd97a, #1d7d3a);
-  border: 1px solid #145a2a; border-radius: 8px;
-  padding: 7px 14px; cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
-}
-
-/* --- iOS notes paper (ReadMe) --- */
-.notes-paper {
-  background: repeating-linear-gradient(180deg, #fdf6c9 0 27px, #e6d79e 27px 28px);
-  border: 1px solid #b3a26a; border-radius: 6px;
-  padding: 4px 14px 18px;
-  font-family: 'Marker Felt', 'Comic Sans MS', 'Share Tech Mono', cursive;
-  color: #3a2f1a; line-height: 28px; font-size: 15px;
-}
-.notes-paper p { margin-bottom: 0; }
-
-/* --- iOS contact form overrides --- */
-#app-contact .field-label { color: #4a5a6a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: bold; }
-#app-contact .field-input, #app-contact .field-textarea, #app-contact .field-select {
-  border-radius: 10px; border: 1px solid #a5adb5;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.18);
-  padding: 10px 11px; font-size: 16px; background: #fff;
-}
-#app-contact .send-btn {
-  width: 100%; border-radius: 10px;
-  background: linear-gradient(180deg, #5dd97a, #1d7d3a);
-  color: #fff; border: 1px solid #145a2a;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  font-size: 16px; padding: 12px; letter-spacing: 1px;
-}
-#app-contact #confirm { border-radius: 8px; }
-
-/* --- iOS alert --- */
-.ios-alert {
-  position: fixed; left: 50%; top: 30%;
-  transform: translateX(-50%);
-  width: min(282px, 84vw); z-index: 30000;
-  background: linear-gradient(180deg, rgba(72,82,112,0.95), rgba(22,28,52,0.97));
-  border: 1.5px solid rgba(255,255,255,0.85); border-radius: 12px;
-  color: #fff; text-align: center;
-  padding: 15px 15px 13px;
-  display: none;
-  box-shadow: 0 10px 36px rgba(0,0,0,0.75);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-.ios-alert.open { display: block; animation: dlgIn 0.18s steps(3); }
-.ios-alert h3 { font-size: 17px; margin-bottom: 7px; }
-.ios-alert .a-msg { font-size: 13.5px; line-height: 1.55; margin-bottom: 13px; }
-.ios-alert .a-btns { display: flex; gap: 8px; }
-.ios-alert button {
-  flex: 1; height: 41px; border-radius: 9px;
-  border: 1px solid rgba(255,255,255,0.7);
-  background: linear-gradient(180deg, rgba(150,160,190,0.55), rgba(45,55,85,0.7));
-  color: #fff; font-size: 15px; font-weight: bold; cursor: pointer;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-.ios-alert button.a-primary { background: linear-gradient(180deg, #5dd97a, #1d7d3a); border-color: #b9f5c8; }
-
-/* ============================================================
-   MOBILE
-   ============================================================ */
-@media (max-width: 640px) {
-  .mac-window {
-    left: 3vw !important;
-    width: 94vw !important;
-    min-width: 0;
-  }
-  .form-row { grid-template-columns: 1fr; }
-  .desk-icon { width: 72px; }
-  .desk-icon .glyph { font-size: 30px; }
-  .menu-item { padding: 0 9px; }
-  #menu-clock { font-size: 11px; padding: 0 8px; }
-  .status-line span:first-child { display: none; }
-  .win-body { max-height: calc(100dvh - 190px); }
-}
-</style>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/mac.css">
+<link rel="stylesheet" href="styles/ios.css">
+<link rel="stylesheet" href="styles/apps.css">
 </head>
 <body>
 
@@ -952,7 +27,7 @@ body.mode-ios { cursor: default; }
   <div class="boot-skip">CLICK ANYWHERE TO SKIP_</div>
 </div>
 
-<!-- Background error text noise -->
+<!-- Background glitch layers -->
 <div class="bg-noise" id="bgNoise"></div>
 <canvas id="glitch-canvas"></canvas>
 <div id="tracking"></div>
@@ -989,6 +64,9 @@ body.mode-ios { cursor: default; }
   </div>
   <div class="menu-item" data-menu>Special
     <div class="dropdown">
+      <div class="dd-item" data-action="open:cleaner">Disk Doctor — repair signal</div>
+      <div class="dd-item" data-action="open:keygen">Run keygen.dmg ⚠</div>
+      <div class="dd-sep"></div>
       <div class="dd-item" data-action="bomb">Crash Gracefully</div>
       <div class="dd-item" data-action="scramble">Scramble Desktop</div>
       <div class="dd-item disabled">Empty Trash</div>
@@ -1004,7 +82,17 @@ body.mode-ios { cursor: default; }
 <!-- DESKTOP -->
 <div id="desktop">
 
-  <!-- icons -->
+  <!-- bottom-left icons: the glitch controls (kept clear of default window spawn) -->
+  <div class="desk-icon" data-open="cleaner" style="bottom: 114px; left: 16px;">
+    <div class="glyph">✚</div>
+    <div class="label">Disk Doctor</div>
+  </div>
+  <div class="desk-icon danger" data-open="keygen" style="bottom: 14px; left: 16px;">
+    <div class="glyph">⚠</div>
+    <div class="label">keygen.dmg</div>
+  </div>
+
+  <!-- right-column icons -->
   <div class="desk-icon" data-open="about" style="top: 18px; right: 16px;">
     <div class="glyph">⍰</div>
     <div class="label">About.txt</div>
@@ -1167,10 +255,51 @@ body.mode-ios { cursor: default; }
       <p>Q: Where?<br>
       A: UK-based, working worldwide. Remote or in your studio.</p>
       <p>Q: This site looks broken.<br>
-      A: It is supposed to. The work isn't.</p>
+      A: It is supposed to. Open <b>Disk Doctor</b> to calm it down — or <b>keygen.dmg</b> if you like chaos. The work isn't broken either way.</p>
       <p style="color:var(--plat-darker)">— scanned this at an art meetup? say hi: <button class="ask-btn" data-open-win="contact" style="margin-top:0">open contact ✉</button></p>
     </div>
     <div class="win-status"><span>plain text</span><span>last modified: 1999</span></div>
+  </div>
+
+  <!-- DISK DOCTOR (cleaner) WINDOW -->
+  <div class="mac-window" id="win-cleaner" style="top: 70px; left: 6vw; width: min(420px, 92vw);">
+    <div class="titlebar">
+      <div class="t-btn" data-win-close></div>
+      <div class="title">Disk Doctor 9.1</div>
+      <div class="t-btn" data-win-shade></div>
+    </div>
+    <div class="win-body">
+      <div class="cleaner">
+        <div class="lcd">
+          <div class="readout">> booting diagnostics…</div>
+          <div class="defrag"></div>
+          <div class="meter"><i></i></div>
+        </div>
+        <button class="app-action" data-clean>▶ REPAIR / DEFRAG NOW</button>
+        <p style="font-size:11px; color:var(--plat-darker); margin-top:8px;">Each pass clears one layer of signal corruption. Run it till the noise calms.</p>
+      </div>
+    </div>
+    <div class="win-status"><span>diagnostic tool</span><span>signed: ODD SIGNAL</span></div>
+  </div>
+
+  <!-- keygen.dmg WINDOW -->
+  <div class="mac-window" id="win-keygen" style="top: 120px; left: 10vw; width: min(360px, 92vw);">
+    <div class="titlebar">
+      <div class="t-btn" data-win-close></div>
+      <div class="title">keygen.dmg</div>
+      <div class="t-btn" data-win-shade></div>
+    </div>
+    <div class="win-body" style="padding: 0;">
+      <div class="keygen">
+        <div class="kg-title">KEYGEN ◈ 1999</div>
+        <div class="kg-crew">— ODD CREW RELEASE —</div>
+        <div class="kg-serial">— press generate —</div>
+        <button class="app-action" data-keygen>✦ GENERATE</button>
+        <div class="kg-note" style="font-size:11px; min-height:14px; margin-top:8px;"></div>
+        <div class="kg-warn">never run untrusted .dmg files. (this one's pretend — but the corruption is real.)</div>
+      </div>
+    </div>
+    <div class="win-status"><span>unsigned</span><span>source: ???</span></div>
   </div>
 
   <!-- BOMB DIALOG -->
@@ -1186,6 +315,22 @@ body.mode-ios { cursor: default; }
     <div class="d-btns">
       <button class="d-btn" data-dlg-close>Ignore</button>
       <button class="d-btn primary" data-dlg-contact>Get Help ✉</button>
+    </div>
+  </div>
+
+  <!-- INFECTION DIALOG (post-storm B hook) -->
+  <div class="dialog" id="infectDialog" style="top: 24%; left: 50%; transform: translateX(-50%);">
+    <div class="d-row">
+      <div class="d-icon">☣</div>
+      <div class="d-text">
+        <b>System Infected</b><br>
+        1 threat remains: "reality.cfg".<br>
+        <span style="color:var(--plat-darker); font-size:11.5px;">Looks broken? Unbreaking things is literally the job.</span>
+      </div>
+    </div>
+    <div class="d-btns">
+      <button class="d-btn" data-dlg-close>Ignore</button>
+      <button class="d-btn primary" data-dlg-contact>Get it fixed →</button>
     </div>
   </div>
 
@@ -1244,6 +389,8 @@ body.mode-ios { cursor: default; }
       <div class="sb-icon" data-app="services"><div class="tile tile-blue">⌬</div><div class="name">Services</div></div>
       <div class="sb-icon" data-app="readme"><div class="tile tile-amber">▤</div><div class="name">ReadMe</div></div>
       <div class="sb-icon" id="sb-signal"><div class="tile tile-dark">▮▯▮</div><div class="name">Signal</div></div>
+      <div class="sb-icon" data-app="cleaner"><div class="tile tile-green">✚</div><div class="name">Disk Doctor</div></div>
+      <div class="sb-icon" data-app="keygen"><div class="tile tile-red">⚠</div><div class="name">keygen.dmg</div></div>
       <div class="sb-icon" id="sb-trash"><div class="tile tile-grey">⌫</div><div class="name">Trash</div></div>
     </div>
     <div class="sb-dock">
@@ -1314,10 +461,43 @@ body.mode-ios { cursor: default; }
         <p>Q: Who is this for?<br>A: Artists, studios, independents. Anyone whose practice deserves better tech than it has.</p>
         <p>Q: What does it cost?<br>A: First conversation is free. After that — depends on the job. No retainers unless you want one.</p>
         <p>Q: Where?<br>A: UK-based, working worldwide. Remote or in your studio.</p>
-        <p>Q: This site looks broken.<br>A: It is supposed to. The work isn't.</p>
+        <p>Q: This site looks broken.<br>A: On purpose. Tap Disk Doctor to calm it — keygen.dmg to break it more.</p>
         <p>— scanned this at an art meetup? say hi → Contact</p>
       </div>
       <button class="ask-btn" data-app-open="contact" style="display:inline-block; margin-top:12px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#fff; background:linear-gradient(180deg,#5dd97a,#1d7d3a); border:1px solid #145a2a; border-radius:8px; padding:9px 16px; cursor:pointer;">✉ Open Contact</button>
+    </div>
+    <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
+  </div>
+
+  <!-- DISK DOCTOR APP -->
+  <div class="ios-app" id="app-cleaner">
+    <div class="ios-navbar"><button class="ios-back" data-app-back>Home</button>Disk Doctor</div>
+    <div class="app-body">
+      <div class="cleaner">
+        <div class="lcd">
+          <div class="readout">> booting diagnostics…</div>
+          <div class="defrag"></div>
+          <div class="meter"><i></i></div>
+        </div>
+        <button class="app-action" data-clean>▶ REPAIR / DEFRAG NOW</button>
+        <p style="font-size:13px; color:#5a6671; margin-top:10px;">Each pass clears one layer of signal corruption. Run it till the noise calms.</p>
+      </div>
+    </div>
+    <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
+  </div>
+
+  <!-- keygen.dmg APP -->
+  <div class="ios-app" id="app-keygen">
+    <div class="ios-navbar"><button class="ios-back" data-app-back>Home</button>keygen.dmg</div>
+    <div class="app-body" style="padding: 0;">
+      <div class="keygen" style="min-height: 100%;">
+        <div class="kg-title">KEYGEN ◈ 1999</div>
+        <div class="kg-crew">— ODD CREW RELEASE —</div>
+        <div class="kg-serial">— press generate —</div>
+        <button class="app-action" data-keygen>✦ GENERATE</button>
+        <div class="kg-note" style="font-size:12px; min-height:16px; margin-top:8px;"></div>
+        <div class="kg-warn">never run untrusted .dmg files. (this one's pretend — but the corruption is real.)</div>
+      </div>
     </div>
     <div class="home-bar"><button class="home-btn" data-app-back aria-label="Home"></button></div>
   </div>
@@ -1334,597 +514,16 @@ body.mode-ios { cursor: default; }
 
 </div><!-- /ios-root -->
 
+<!-- POPUP STORM overlay + conversion toast -->
+<div id="storm"></div>
+<div id="toast"></div>
+
 <!-- STATUS BAR -->
 <div class="status-line">
   <span>ODD SIGNAL · UK-BASED · WORKING WORLDWIDE</span>
   <span id="statusRight"><span class="status-blink">▮</span> SIGNAL ACTIVE</span>
 </div>
 
-<script>
-/* ============================================================
-   BOOT SEQUENCE
-   ============================================================ */
-const boot = document.getElementById('boot');
-const bootFill = document.getElementById('bootFill');
-const bootLog = document.getElementById('bootLog');
-const bootFace = document.getElementById('bootFace');
-const bootLines = [
-  ['init oddsignal.kernel', 'ok'],
-  ['mount /dev/practice', 'ok'],
-  ['load extension: PRIVATE_AI', 'ok'],
-  ['load extension: HARDWARE_ART', 'ok'],
-  ['load extension: CORPORATE_JARGON', 'err'],
-  ['  └ skipped. not needed.', ''],
-  ['detect carrier… FOUND (anomalous)', 'ok'],
-  ['welcome.', 'ok'],
-];
-let bootDone = false;
-function isIOSMode() { return document.body.classList.contains('mode-ios'); }
-// phones skip the Mac boot — the iOS lock screen is their entry
-if ((window.innerWidth || document.documentElement.clientWidth || screen.width) <= 640) { bootDone = true; boot.remove(); }
-function finishBoot() {
-  if (bootDone) return;
-  bootDone = true;
-  boot.classList.add('done');
-  setTimeout(() => { boot.remove(); if (!isIOSMode()) openWin('about'); }, 600);
-  // funnel dialog appears after a beat
-  setTimeout(() => { if (!isIOSMode()) document.getElementById('helloDialog').classList.add('open'); }, 6000);
-}
-boot.addEventListener('click', finishBoot);
-(function runBoot() {
-  let i = 0, pct = 0;
-  const faces = [':|', ':)', ':D', ';)'];
-  const step = () => {
-    if (bootDone) return;
-    if (i < bootLines.length) {
-      const [txt, cls] = bootLines[i];
-      const div = document.createElement('div');
-      div.innerHTML = (cls === 'err' ? '<span class="err">✕</span> ' : cls === 'ok' ? '<span class="ok">✓</span> ' : '&nbsp;&nbsp;') + txt;
-      bootLog.appendChild(div);
-      while (bootLog.children.length > 6) bootLog.removeChild(bootLog.firstChild);
-      i++;
-    }
-    pct = Math.min(100, pct + Math.random() * 18 + 6);
-    bootFill.style.width = pct + '%';
-    bootFace.textContent = faces[Math.min(faces.length - 1, Math.floor(pct / 30))];
-    if (pct >= 100 && i >= bootLines.length) { setTimeout(finishBoot, 700); }
-    else setTimeout(step, Math.random() * 300 + 180);
-  };
-  setTimeout(step, 400);
-})();
-
-/* ============================================================
-   BACKGROUND NOISE
-   ============================================================ */
-const noiseEl = document.getElementById('bgNoise');
-const chars = '01アイウエオカキクケコサシスセソ░▒▓█▄▀■□▪◆◇ABCDEF0123456789ERR_SIG_OVF_NULL_REF_BAD_ADDR_CORRUPT_OVERFLOW_SEGFAULT';
-for (let i = 0; i < 110; i++) {
-  const s = document.createElement('span');
-  const len = Math.floor(Math.random() * 22) + 4;
-  s.textContent = Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  s.style.left = Math.random() * 100 + 'vw';
-  s.style.top = Math.random() * 100 + 'vh';
-  s.style.animationDelay = (Math.random() * 2) + 's';
-  s.style.animationDuration = (Math.random() * 3 + 3) + 's';
-  s.style.fontSize = (Math.random() > 0.2 ? 11 : Math.floor(Math.random() * 16 + 14)) + 'px';
-  s.style.transform = `rotate(${Math.random() > 0.6 ? 90 : 0}deg)`;
-  noiseEl.appendChild(s);
-}
-setInterval(() => {
-  const spans = noiseEl.querySelectorAll('span');
-  const count = Math.floor(Math.random() * 5) + 1;
-  for (let i = 0; i < count; i++) {
-    const target = spans[Math.floor(Math.random() * spans.length)];
-    const colors = ['#ff2244', '#ffaa00', '#00aaff', '#39ff6e'];
-    target.style.color = colors[Math.floor(Math.random() * colors.length)];
-    target.style.opacity = '0.5';
-    setTimeout(() => {
-      target.textContent = Array.from({ length: Math.floor(Math.random() * 22) + 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-      target.style.color = '';
-      target.style.opacity = '';
-    }, 160);
-  }
-}, 1400);
-
-/* ============================================================
-   CANVAS GLITCH BARS
-   ============================================================ */
-const canvas = document.getElementById('glitch-canvas');
-const ctx = canvas.getContext('2d');
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-const glitchColors = ['rgba(57,255,110,0.07)', 'rgba(255,34,68,0.09)', 'rgba(0,170,255,0.07)', 'rgba(255,170,0,0.06)'];
-function drawGlitch() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (Math.random() > 0.3) {
-    const bars = Math.floor(Math.random() * 6) + 1;
-    for (let i = 0; i < bars; i++) {
-      ctx.fillStyle = glitchColors[Math.floor(Math.random() * glitchColors.length)];
-      ctx.fillRect(0, Math.random() * canvas.height, canvas.width, Math.random() * 4 + 1);
-    }
-  }
-  if (Math.random() > 0.94) {
-    ctx.fillStyle = 'rgba(57,255,110,0.12)';
-    ctx.fillRect(0, Math.random() * canvas.height, canvas.width, Math.random() * 2 + 1);
-  }
-  if (Math.random() > 0.985) {
-    ctx.fillStyle = 'rgba(255,34,68,0.12)';
-    ctx.fillRect(0, Math.random() * canvas.height, canvas.width, 1);
-  }
-  setTimeout(drawGlitch, Math.random() * 120 + 40);
-}
-drawGlitch();
-
-/* ============================================================
-   VHS TRACKING SWEEP + RGB SPLIT (smooth, non-strobe)
-   ============================================================ */
-const tracking = document.getElementById('tracking');
-function runTracking() {
-  if (document.hidden) return;
-  tracking.classList.remove('run');
-  void tracking.offsetWidth; // restart animation
-  tracking.classList.add('run');
-}
-setInterval(() => { if (Math.random() > 0.35) runTracking(); }, 5200);
-
-function rgbHitHeadings() {
-  const heads = [...document.querySelectorAll('.mac-window.open .win-body h2, .ios-app.open .app-body h2')];
-  if (!heads.length) return;
-  const h = heads[Math.floor(Math.random() * heads.length)];
-  h.classList.remove('rgb-hit');
-  void h.offsetWidth;
-  h.classList.add('rgb-hit');
-}
-setInterval(() => { if (Math.random() > 0.45) rgbHitHeadings(); }, 4700);
-
-/* ============================================================
-   WINDOW MANAGER
-   ============================================================ */
-let zTop = 200;
-const wins = {
-  about: document.getElementById('win-about'),
-  services: document.getElementById('win-services'),
-  contact: document.getElementById('win-contact'),
-  readme: document.getElementById('win-readme'),
-};
-
-function focusWin(el) {
-  Object.values(wins).forEach(w => w.classList.add('inactive'));
-  el.classList.remove('inactive');
-  el.style.zIndex = ++zTop;
-}
-
-function openWin(name) {
-  const el = wins[name];
-  if (!el) return;
-  el.classList.add('open');
-  el.classList.remove('shaded');
-  focusWin(el);
-  // brief glitch on open
-  el.classList.add('glitching');
-  setTimeout(() => el.classList.remove('glitching'), 240);
-}
-
-function closeWin(el) { el.classList.remove('open'); }
-
-Object.values(wins).forEach(win => {
-  win.addEventListener('pointerdown', () => focusWin(win));
-
-  const bar = win.querySelector('.titlebar');
-  const closeBtn = win.querySelector('[data-win-close]');
-  const shadeBtn = win.querySelector('[data-win-shade]');
-  closeBtn.addEventListener('click', e => { e.stopPropagation(); closeWin(win); });
-  shadeBtn.addEventListener('click', e => { e.stopPropagation(); win.classList.toggle('shaded'); });
-  // classic windowshade: double-click titlebar
-  bar.addEventListener('dblclick', () => win.classList.toggle('shaded'));
-
-  // drag
-  let drag = null;
-  bar.addEventListener('pointerdown', e => {
-    if (e.target.closest('.t-btn')) return;
-    drag = { x: e.clientX - win.offsetLeft, y: e.clientY - win.offsetTop };
-    bar.setPointerCapture(e.pointerId);
-  });
-  bar.addEventListener('pointermove', e => {
-    if (!drag) return;
-    const desk = document.getElementById('desktop');
-    let nx = e.clientX - drag.x;
-    let ny = e.clientY - drag.y;
-    nx = Math.max(-win.offsetWidth + 80, Math.min(nx, desk.clientWidth - 60));
-    ny = Math.max(0, Math.min(ny, desk.clientHeight - 30));
-    win.style.left = nx + 'px';
-    win.style.top = ny + 'px';
-  });
-  const endDrag = () => { drag = null; };
-  bar.addEventListener('pointerup', endDrag);
-  bar.addEventListener('pointercancel', endDrag);
-});
-
-/* random glitch slice on a visible window */
-setInterval(() => {
-  const open = Object.values(wins).filter(w => w.classList.contains('open'));
-  if (open.length && Math.random() > 0.55) {
-    const w = open[Math.floor(Math.random() * open.length)];
-    w.classList.add('glitching');
-    setTimeout(() => w.classList.remove('glitching'), 240);
-  }
-}, 4000);
-
-/* ============================================================
-   DESKTOP ICONS
-   ============================================================ */
-document.querySelectorAll('.desk-icon').forEach(icon => {
-  icon.addEventListener('click', () => {
-    document.querySelectorAll('.desk-icon').forEach(i => i.classList.remove('selected'));
-    icon.classList.add('selected');
-    const t = icon.dataset.open;
-    if (t === 'trash') {
-      showDialog('bombDialog');
-    } else {
-      setTimeout(() => openWin(t), 120);
-    }
-  });
-});
-
-/* buttons inside windows that open other windows */
-document.querySelectorAll('[data-open-win]').forEach(b =>
-  b.addEventListener('click', () => openWin(b.dataset.openWin)));
-
-/* ============================================================
-   MENU BAR
-   ============================================================ */
-const menuItems = document.querySelectorAll('.menu-item[data-menu]');
-function closeMenus() { menuItems.forEach(m => m.classList.remove('open')); }
-menuItems.forEach(m => {
-  m.addEventListener('click', e => {
-    e.stopPropagation();
-    const was = m.classList.contains('open');
-    closeMenus();
-    if (!was) m.classList.add('open');
-  });
-});
-document.addEventListener('click', closeMenus);
-
-function doAction(action) {
-  if (!action) return;
-  if (action.startsWith('open:')) openWin(action.slice(5));
-  else if (action === 'closeAll') Object.values(wins).forEach(closeWin);
-  else if (action === 'reboot') location.reload();
-  else if (action === 'bomb') showDialog('bombDialog');
-  else if (action === 'scramble') scrambleDesktop();
-  else if (action.startsWith('svc:')) {
-    openWin('services');
-    setTimeout(() => toggleSvc(action.slice(4), true), 150);
-  }
-}
-document.querySelectorAll('.dd-item[data-action]').forEach(d =>
-  d.addEventListener('click', () => doAction(d.dataset.action)));
-document.querySelectorAll('[data-action-direct]').forEach(d =>
-  d.addEventListener('click', () => doAction(d.dataset.actionDirect)));
-
-/* keyboard shortcuts: cmd/ctrl 1-3, W */
-document.addEventListener('keydown', e => {
-  if (!(e.metaKey || e.ctrlKey)) return;
-  const map = { '1': 'open:about', '2': 'open:services', '3': 'open:contact', 'w': 'closeAll' };
-  if (map[e.key]) { e.preventDefault(); doAction(map[e.key]); }
-});
-
-/* clock */
-function tickClock() {
-  const d = new Date();
-  const t = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  document.getElementById('menu-clock').textContent = t;
-  document.getElementById('ios-time').textContent = t;
-  document.getElementById('lock-time').textContent = t;
-  document.getElementById('lock-date').textContent =
-    d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-}
-tickClock();
-setInterval(tickClock, 10000);
-
-/* ============================================================
-   SERVICES finder rows
-   ============================================================ */
-function toggleSvc(id, forceOpen) {
-  const row = document.querySelector(`.finder-row[data-svc="${id}"]`);
-  const desc = document.querySelector(`.finder-desc[data-svc-desc="${id}"]`);
-  const isOpen = desc.classList.contains('show');
-  document.querySelectorAll('.finder-desc').forEach(d => d.classList.remove('show'));
-  document.querySelectorAll('.finder-row').forEach(r => r.classList.remove('expanded'));
-  if (forceOpen || !isOpen) {
-    desc.classList.add('show');
-    row.classList.add('expanded');
-  }
-}
-document.querySelectorAll('.finder-row').forEach(r =>
-  r.addEventListener('click', () => toggleSvc(r.dataset.svc)));
-
-/* "Ask about this" -> opens contact with service preselected */
-document.querySelectorAll('[data-ask]').forEach(b =>
-  b.addEventListener('click', () => {
-    openWin('contact');
-    const sel = document.getElementById('serviceSelect');
-    [...sel.options].forEach(o => {
-      if (o.text.toLowerCase().startsWith(b.dataset.ask.toLowerCase().slice(0, 8))) sel.value = o.value || o.text;
-    });
-    // match by text content
-    [...sel.options].forEach(o => { if (o.text === b.dataset.ask.replace('&amp;', '&')) o.selected = true; });
-  }));
-
-/* ============================================================
-   DIALOGS
-   ============================================================ */
-function showDialog(id) {
-  const d = document.getElementById(id);
-  d.classList.add('open');
-  d.style.zIndex = ++zTop + 10000;
-}
-document.querySelectorAll('[data-dlg-close]').forEach(b =>
-  b.addEventListener('click', () => b.closest('.dialog').classList.remove('open')));
-document.querySelectorAll('[data-dlg-contact]').forEach(b =>
-  b.addEventListener('click', () => {
-    b.closest('.dialog').classList.remove('open');
-    openWin('contact');
-  }));
-
-/* rare spontaneous bomb (memorable, not annoying: once per visit, late) */
-setTimeout(() => {
-  if (Math.random() > 0.5) { isIOSMode() ? iosBomb() : showDialog('bombDialog'); }
-}, 90000);
-
-/* scramble desktop easter egg */
-function scrambleDesktop() {
-  document.querySelectorAll('.desk-icon').forEach(i => {
-    i.style.transition = 'all 0.4s steps(5)';
-    i.style.top = (Math.random() * 70 + 5) + '%';
-    i.style.left = (Math.random() * 80 + 2) + '%';
-    i.style.right = 'auto';
-    i.style.bottom = 'auto';
-  });
-}
-
-/* ============================================================
-   STATUS BAR
-   ============================================================ */
-const statuses = [
-  'SIGNAL ACTIVE',
-  'CARRIER DETECTED',
-  'TRANSMITTING...',
-  'SIG:ANOMALOUS — NOMINAL',
-  'UPTIME: OK',
-  'ERR_CORRECTED',
-  'FIRST CHAT FREE — NO JARGON',
-];
-let si = 0;
-setInterval(() => {
-  si = (si + 1) % statuses.length;
-  document.getElementById('statusRight').innerHTML =
-    '<span class="status-blink">▮</span> ' + statuses[si];
-}, 4000);
-
-/* ============================================================
-   CONTACT FORM (Formspree)
-   ============================================================ */
-const contactForm = document.getElementById('contact-form');
-contactForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = contactForm.querySelector('.send-btn');
-  const confirm = document.getElementById('confirm');
-  btn.textContent = '⏎ TRANSMITTING...';
-  contactForm.style.opacity = '0.4';
-  contactForm.style.pointerEvents = 'none';
-  document.getElementById('contactStatus').textContent = 'carrier: BUSY';
-  try {
-    const res = await fetch(contactForm.action, {
-      method: 'POST',
-      body: new FormData(contactForm),
-      headers: { 'Accept': 'application/json' }
-    });
-    if (res.ok) {
-      confirm.textContent = '> MESSAGE RECEIVED. EXPECT RESPONSE WITHIN 2 WORKING DAYS._';
-      confirm.style.color = 'var(--green-dim)';
-    } else {
-      confirm.textContent = '> ERR: TRANSMISSION FAILED. PLEASE EMAIL DIRECTLY._';
-      confirm.style.color = 'var(--red)';
-    }
-  } catch {
-    confirm.textContent = '> ERR: NO CARRIER. PLEASE EMAIL DIRECTLY._';
-    confirm.style.color = 'var(--red)';
-  }
-  confirm.style.display = 'block';
-  document.getElementById('contactStatus').textContent = 'carrier: OK';
-  setTimeout(() => {
-    confirm.style.display = 'none';
-    contactForm.reset();
-    contactForm.style.opacity = '1';
-    contactForm.style.pointerEvents = '';
-    btn.textContent = '⏎ TRANSMIT';
-  }, 7000);
-});
-
-/* ============================================================
-   iOS MODE — mode switch, lock screen, springboard, apps
-   ============================================================ */
-const iosFormSlot = document.getElementById('ios-form-slot');
-const macFormSlot = document.getElementById('mac-form-slot');
-const formWrap = document.getElementById('contact-form-wrap');
-
-function viewportW() {
-  // some webviews report 0 during load — fall back to stabler metrics
-  return window.innerWidth || document.documentElement.clientWidth || screen.width;
-}
-function setMode() {
-  const ios = viewportW() <= 640;
-  document.body.classList.toggle('mode-ios', ios);
-  // the one contact form lives wherever the active UI needs it
-  const slot = ios ? iosFormSlot : macFormSlot;
-  if (formWrap.parentElement !== slot) slot.appendChild(formWrap);
-}
-setMode();
-window.addEventListener('resize', setMode);
-
-/* status bar signal bars */
-const barsEl = document.getElementById('ios-bars');
-for (let i = 0; i < 5; i++) {
-  const b = document.createElement('i');
-  b.style.height = (3 + i * 2) + 'px';
-  barsEl.appendChild(b);
-}
-setInterval(() => {
-  if (!isIOSMode()) return;
-  const strength = Math.random() > 0.18 ? 5 : Math.floor(Math.random() * 4) + 1;
-  [...barsEl.children].forEach((b, i) => b.style.opacity = i < strength ? '1' : '0.25');
-}, 2200);
-
-/* carrier name corruption */
-const carrierEl = document.getElementById('ios-carrier');
-const carrierGlitches = ['0DD S1GNAL', 'ODD SIGN▓L', '◉DD_SIGNAL', 'NO SERVICE'];
-setInterval(() => {
-  if (!isIOSMode() || Math.random() < 0.45) return;
-  carrierEl.textContent = carrierGlitches[Math.floor(Math.random() * carrierGlitches.length)];
-  setTimeout(() => { carrierEl.textContent = 'ODD SIGNAL'; }, 220);
-}, 4100);
-
-/* battery jitter, brief red scare */
-const battFill = document.getElementById('batt-fill');
-setInterval(() => {
-  if (!isIOSMode() || Math.random() < 0.6) return;
-  battFill.style.width = Math.floor(Math.random() * 70 + 15) + '%';
-  if (Math.random() > 0.7) {
-    battFill.style.background = 'linear-gradient(180deg, #ff8a7a, #b00f00)';
-    setTimeout(() => { battFill.style.background = ''; }, 300);
-  }
-}, 5600);
-
-/* slide to unlock */
-const lockscreen = document.getElementById('lockscreen');
-const sliderTrack = document.getElementById('slider-track');
-const sliderThumb = document.getElementById('slider-thumb');
-const sliderLabel = document.getElementById('slider-label');
-let unlockedOnce = false;
-let sdrag = null;
-
-sliderThumb.addEventListener('pointerdown', e => {
-  sdrag = { x: e.clientX, dx: 0, max: sliderTrack.clientWidth - sliderThumb.offsetWidth - 8 };
-  sliderThumb.style.transition = 'none';
-  sliderThumb.setPointerCapture(e.pointerId);
-});
-sliderThumb.addEventListener('pointermove', e => {
-  if (!sdrag) return;
-  sdrag.dx = Math.max(0, Math.min(e.clientX - sdrag.x, sdrag.max));
-  sliderThumb.style.transform = `translateX(${sdrag.dx}px)`;
-  sliderLabel.style.opacity = String(1 - sdrag.dx / sdrag.max);
-});
-function sliderEnd() {
-  if (!sdrag) return;
-  if (sdrag.dx >= sdrag.max * 0.85) unlock();
-  else {
-    sliderThumb.style.transition = 'transform 0.25s';
-    sliderThumb.style.transform = 'translateX(0)';
-    sliderLabel.style.opacity = '';
-  }
-  sdrag = null;
-}
-sliderThumb.addEventListener('pointerup', sliderEnd);
-sliderThumb.addEventListener('pointercancel', sliderEnd);
-
-function unlock() {
-  lockscreen.classList.add('unlocked');
-  if (!unlockedOnce) {
-    unlockedOnce = true;
-    setTimeout(() => {
-      if (isIOSMode()) iosAlertShow('INCOMING TRANSMISSION',
-        'Tech problem in your practice? Website shame? AI curiosity? A sculpture that should blink? First conversation is free.',
-        'Talk to us', () => openApp('contact'));
-    }, 5000);
-  }
-}
-
-/* slider label corruption */
-setInterval(() => {
-  if (!isIOSMode() || lockscreen.classList.contains('unlocked') || Math.random() < 0.5) return;
-  const alts = ['slide to transmit', 'sl1de t0 unl0ck', 'slide to unlock'];
-  sliderLabel.textContent = alts[Math.floor(Math.random() * alts.length)];
-  setTimeout(() => { sliderLabel.textContent = 'slide to unlock'; }, 900);
-}, 6000);
-
-/* app open/close with springboard zoom */
-function openApp(name) {
-  const a = document.getElementById('app-' + name);
-  if (!a) return;
-  a.classList.add('open');
-  requestAnimationFrame(() => requestAnimationFrame(() => a.classList.add('in')));
-}
-function closeApps() {
-  document.querySelectorAll('.ios-app.open').forEach(a => {
-    a.classList.remove('in');
-    setTimeout(() => a.classList.remove('open'), 290);
-  });
-}
-document.querySelectorAll('.sb-icon[data-app]').forEach(i =>
-  i.addEventListener('click', () => openApp(i.dataset.app)));
-document.querySelectorAll('[data-app-back]').forEach(b =>
-  b.addEventListener('click', closeApps));
-document.querySelectorAll('[data-app-open]').forEach(b =>
-  b.addEventListener('click', () => openApp(b.dataset.appOpen)));
-
-/* special springboard icons */
-document.getElementById('sb-trash').addEventListener('click', iosBomb);
-document.getElementById('sb-signal').addEventListener('click', () => {
-  runTracking();
-  carrierEl.textContent = 'SIG:ANOMALOUS';
-  setTimeout(() => { carrierEl.textContent = 'ODD SIGNAL'; }, 1200);
-});
-document.getElementById('sb-mail').addEventListener('click', () => {
-  location.href = 'mailto:hello@oddsignal.net';
-});
-
-/* iOS services table */
-document.querySelectorAll('.ios-cell[data-isvc]').forEach(c =>
-  c.addEventListener('click', () => {
-    const desc = document.querySelector(`.ios-cell-desc[data-isvc-desc="${c.dataset.isvc}"]`);
-    const was = desc.classList.contains('show');
-    document.querySelectorAll('.ios-cell-desc').forEach(d => d.classList.remove('show'));
-    if (!was) desc.classList.add('show');
-  }));
-document.querySelectorAll('[data-ask-ios]').forEach(b =>
-  b.addEventListener('click', () => {
-    openApp('contact');
-    const sel = document.getElementById('serviceSelect');
-    [...sel.options].forEach(o => { if (o.text === b.dataset.askIos) o.selected = true; });
-  }));
-
-/* iOS alert (funnel + bomb) */
-const iosAlertEl = document.getElementById('iosAlert');
-let iaAction = null;
-function iosAlertShow(title, msg, primary, onPrimary) {
-  document.getElementById('ia-title').textContent = title;
-  document.getElementById('ia-msg').textContent = msg;
-  document.getElementById('ia-primary').textContent = primary;
-  iaAction = onPrimary;
-  iosAlertEl.classList.add('open');
-}
-document.getElementById('ia-cancel').addEventListener('click', () => iosAlertEl.classList.remove('open'));
-document.getElementById('ia-primary').addEventListener('click', () => {
-  iosAlertEl.classList.remove('open');
-  if (iaAction) iaAction();
-});
-function iosBomb() {
-  iosAlertShow('System Error',
-    '"reality.cfg" — error of Type -23 (signal too odd). This is exactly the kind of thing we fix for other people.',
-    'Get Help', () => openApp('contact'));
-}
-
-/* springboard icon RGB tears */
-setInterval(() => {
-  if (!isIOSMode() || Math.random() < 0.5) return;
-  const tiles = document.querySelectorAll('#springboard .tile');
-  const t = tiles[Math.floor(Math.random() * tiles.length)];
-  t.classList.remove('rgb-hit');
-  void t.offsetWidth;
-  t.classList.add('rgb-hit');
-}, 5100);
-</script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
